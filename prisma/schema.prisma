@@ -117,8 +117,8 @@ model User {
   createdConversations Conversation[] @relation("ConversationCreator")
 
   notifications Notification[]
-  reports       Report[] @relation("Reporter")
-  auditLogs     AuditLog[] @relation("AuditActor")
+  reports       Report[]       @relation("Reporter")
+  auditLogs     AuditLog[]     @relation("AuditActor")
 
   reviewsGiven Review[] @relation("ReviewAuthor")
 }
@@ -145,8 +145,8 @@ model StudentProfile {
 
   parentRelationships ParentStudent[]
 
-  subjects StudentSubject[]
-
+  subjects      StudentSubject[]
+  availability  StudentAvailability[]
   learningGoals LearningGoal[]
 
   budget Budget?
@@ -189,7 +189,7 @@ model ParentStudent {
   studentId String
 
   relationship String
-  isPrimary   Boolean @default(false)
+  isPrimary    Boolean @default(false)
 
   createdAt DateTime @default(now())
 
@@ -241,9 +241,9 @@ model EducationRecord {
   id      String @id @default(cuid())
   tutorId String
 
-  degree      String
-  department  String?
-  institution String
+  degree         String
+  department     String?
+  institution    String
   graduationYear Int?
 
   createdAt DateTime @default(now())
@@ -258,7 +258,7 @@ model TutorDocument {
   id      String @id @default(cuid())
   tutorId String
 
-  type DocumentType
+  type  DocumentType
   title String
 
   fileUrl  String
@@ -270,7 +270,7 @@ model TutorDocument {
 
   extractedText String?
 
-  uploadedAt DateTime @default(now())
+  uploadedAt DateTime  @default(now())
   verifiedAt DateTime?
 
   tutor TutorProfile @relation(fields: [tutorId], references: [id], onDelete: Cascade)
@@ -279,8 +279,8 @@ model TutorDocument {
 }
 
 model Subject {
-  id          String @id @default(cuid())
-  name        String @unique
+  id          String  @id @default(cuid())
+  name        String  @unique
   description String?
 
   createdAt DateTime @default(now())
@@ -291,14 +291,14 @@ model Subject {
 
 model TutorSubject {
   id        String @id @default(cuid())
-  tutorId  String
+  tutorId   String
   subjectId String
 
   proficiencyLevel String?
   gradeLevels      String[]
 
   tutor   TutorProfile @relation(fields: [tutorId], references: [id], onDelete: Cascade)
-  subject Subject     @relation(fields: [subjectId], references: [id], onDelete: Cascade)
+  subject Subject      @relation(fields: [subjectId], references: [id], onDelete: Cascade)
 
   @@unique([tutorId, subjectId])
 }
@@ -312,7 +312,7 @@ model StudentSubject {
   needsHelp    Boolean @default(true)
 
   student StudentProfile @relation(fields: [studentId], references: [id], onDelete: Cascade)
-  subject Subject       @relation(fields: [subjectId], references: [id], onDelete: Cascade)
+  subject Subject        @relation(fields: [subjectId], references: [id], onDelete: Cascade)
 
   @@unique([studentId, subjectId])
 }
@@ -338,7 +338,7 @@ model Budget {
   studentId String @unique
 
   maxAmount Decimal
-  currency   String @default("ETB")
+  currency  String  @default("ETB")
 
   period String?
 
@@ -369,7 +369,7 @@ model TutorPricing {
   tutorId String
 
   amount   Decimal
-  currency String @default("ETB")
+  currency String  @default("ETB")
 
   durationMinutes Int
 
@@ -444,7 +444,7 @@ model Session {
 
   status SessionStatus @default(SCHEDULED)
 
-  startedAt  DateTime?
+  startedAt   DateTime?
   completedAt DateTime?
 
   notes String?
@@ -474,10 +474,10 @@ model Payment {
   bookingId String @unique
 
   amount   Decimal
-  currency String @default("ETB")
+  currency String  @default("ETB")
 
-  provider        String?
-  transactionId   String?
+  provider      String?
+  transactionId String?
 
   status PaymentStatus @default(PENDING)
 
@@ -498,8 +498,8 @@ model Conversation {
 
   status ConversationStatus @default(OPEN)
 
-  createdAt DateTime @default(now())
-  closedAt DateTime?
+  createdAt DateTime  @default(now())
+  closedAt  DateTime?
 
   creator User @relation("ConversationCreator", fields: [creatorId], references: [id])
 
@@ -531,7 +531,7 @@ model Message {
 
   content String
 
-  createdAt DateTime @default(now())
+  createdAt DateTime  @default(now())
   readAt    DateTime?
 
   conversation Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
@@ -548,7 +548,7 @@ model Review {
   studentId String
   authorId  String
 
-  rating Int
+  rating  Int
   comment String?
 
   status ReviewStatus @default(PENDING)
@@ -572,8 +572,8 @@ model Assessment {
   title       String
   description String?
 
-  score       Decimal?
-  maxScore    Decimal?
+  score    Decimal?
+  maxScore Decimal?
 
   createdAt DateTime @default(now())
 
@@ -622,7 +622,7 @@ model Report {
   targetType String
   targetId   String
 
-  reason String
+  reason      String
   description String?
 
   status ReportStatus @default(OPEN)
@@ -640,8 +640,8 @@ model AuditLog {
 
   actorId String?
 
-  action String
-  entity String
+  action   String
+  entity   String
   entityId String?
 
   metadata Json?
@@ -652,4 +652,20 @@ model AuditLog {
 
   @@index([entity, entityId])
   @@index([actorId, createdAt])
+}
+
+model StudentAvailability {
+  id        String @id @default(cuid())
+  studentId String
+
+  dayOfWeek Int
+  startTime String
+  endTime   String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  student StudentProfile @relation(fields: [studentId], references: [id], onDelete: Cascade)
+
+  @@index([studentId, dayOfWeek])
 }
