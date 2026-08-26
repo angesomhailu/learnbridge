@@ -3,7 +3,7 @@ import "./globals.css";
 
 export const metadata: Metadata = {
   title: "LearnBridge",
-  description: "AI-Assisted Tutor–Student Matching and Personalized Learning Platform",
+  description: "Tutor-Student Matching and Personalized Learning Platform",
 };
 
 export default function RootLayout({
