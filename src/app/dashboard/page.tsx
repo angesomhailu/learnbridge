@@ -1,6 +1,5 @@
 import { auth } from "@/auth";
 import { redirect } from "next/navigation";
-import LogoutButton from "@/components/LogoutButton";
 
 export default async function DashboardPage() {
     const session = await auth();
@@ -9,17 +8,20 @@ export default async function DashboardPage() {
         redirect("/login");
     }
 
-    return (
-        <main>
-            <h1>Welcome to LearnBridge</h1>
+    switch (session.user.role) {
+        case "STUDENT":
+            redirect("/student");
 
-            <p>Email: {session.user.email}</p>
+        case "PARENT":
+            redirect("/parent");
 
-            <p>Role: {session.user.role}</p>
+        case "TUTOR":
+            redirect("/tutor");
 
-            <p>User ID: {session.user.id}</p>
+        case "ADMIN":
+            redirect("/admin");
 
-            <LogoutButton />
-        </main>
-    );
+        default:
+            redirect("/login");
+    }
 }
