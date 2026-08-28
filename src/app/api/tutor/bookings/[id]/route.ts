@@ -116,13 +116,31 @@ export async function PATCH(
         }
 
         const updatedBooking =
-            await prisma.booking.update({
-                where: {
-                    id,
-                },
-                data: {
-                    status,
-                },
+            await prisma.$transaction(async (tx) => {
+                const updated =
+                    await tx.booking.update({
+                        where: {
+                            id,
+                        },
+                        data: {
+                            status,
+                        },
+                    });
+
+                if (status === "CONFIRMED") {
+                    await tx.session.upsert({
+                        where: {
+                            bookingId: id,
+                        },
+                        update: {},
+                        create: {
+                            bookingId: id,
+                            status: "SCHEDULED",
+                        },
+                    });
+                }
+
+                return updated;
             });
 
         return NextResponse.json({
