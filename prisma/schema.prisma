@@ -419,6 +419,8 @@ model Booking {
   startTime DateTime
   endTime   DateTime
 
+  amount Decimal @db.Decimal(10, 2)
+
   status BookingStatus @default(PENDING)
 
   createdAt DateTime @default(now())
@@ -436,6 +438,7 @@ model Booking {
 
   @@index([studentId, startTime])
   @@index([tutorId, startTime])
+  amount Decimal @db.Decimal(10, 2)
 }
 
 model Session {
