@@ -1,15 +1,38 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 
-export async function GET() {
+export async function GET(request: Request) {
     try {
+        const { searchParams } =
+            new URL(request.url);
+
+        const subject =
+            searchParams.get("subject");
+
         const tutors =
             await prisma.tutorProfile.findMany({
                 where: {
                     verificationStatus: "VERIFIED",
+
                     user: {
                         status: "ACTIVE",
                     },
+
+                    ...(subject
+                        ? {
+                            subjects: {
+                                some: {
+                                    subject: {
+                                        name: {
+                                            equals:
+                                                subject,
+                                            mode: "insensitive",
+                                        },
+                                    },
+                                },
+                            },
+                        }
+                        : {}),
                 },
 
                 include: {
