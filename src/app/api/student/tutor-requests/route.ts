@@ -154,3 +154,89 @@ export async function POST(
         );
     }
 }
+
+export async function GET() {
+    try {
+        const session = await auth();
+
+        if (!session?.user?.email) {
+            return NextResponse.json(
+                {
+                    success: false,
+                    message:
+                        "Authentication required",
+                },
+                { status: 401 }
+            );
+        }
+
+        const student =
+            await prisma.studentProfile.findFirst({
+                where: {
+                    user: {
+                        email:
+                            session.user.email,
+                    },
+                },
+            });
+
+        if (!student) {
+            return NextResponse.json(
+                {
+                    success: false,
+                    message:
+                        "Student profile not found",
+                },
+                { status: 404 }
+            );
+        }
+
+        const requests =
+            await prisma.tutorRequest.findMany({
+                where: {
+                    studentId: student.id,
+                },
+
+                include: {
+                    tutor: {
+                        include: {
+                            user: {
+                                select: {
+                                    email: true,
+                                },
+                            },
+
+                            subjects: {
+                                include: {
+                                    subject: true,
+                                },
+                            },
+                        },
+                    },
+                },
+
+                orderBy: {
+                    createdAt: "desc",
+                },
+            });
+
+        return NextResponse.json({
+            success: true,
+            requests,
+        });
+    } catch (error) {
+        console.error(
+            "Get student requests error:",
+            error
+        );
+
+        return NextResponse.json(
+            {
+                success: false,
+                message:
+                    "Failed to retrieve tutor requests",
+            },
+            { status: 500 }
+        );
+    }
+}
