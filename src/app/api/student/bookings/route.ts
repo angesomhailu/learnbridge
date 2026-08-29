@@ -304,6 +304,8 @@ export async function POST(request: Request) {
 
                     endTime: end,
 
+                    amount: amount,
+
                     status: "PENDING",
 
                     session: {
@@ -315,6 +317,7 @@ export async function POST(request: Request) {
 
                 include: {
                     session: true,
+
                     tutor: {
                         include: {
                             user: {
