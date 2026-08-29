@@ -246,6 +246,49 @@ export async function POST(request: Request) {
                 { status: 409 }
             );
         }
+        // Get tutor pricing
+        const tutorPricing =
+            await prisma.tutorPricing.findFirst({
+                where: {
+                    tutorId: tutorRequest.tutorId,
+                },
+                orderBy: {
+                    durationMinutes: "asc",
+                },
+            });
+
+        if (!tutorPricing) {
+            return NextResponse.json(
+                {
+                    success: false,
+                    message:
+                        "Tutor pricing has not been configured",
+                },
+                { status: 400 }
+            );
+        }
+
+        // Calculate booking duration
+        const durationMinutes =
+            (end.getTime() - start.getTime()) /
+            (1000 * 60);
+
+        if (durationMinutes <= 0) {
+            return NextResponse.json(
+                {
+                    success: false,
+                    message:
+                        "Booking duration must be greater than zero",
+                },
+                { status: 400 }
+            );
+        }
+
+        // Calculate price based on tutor's pricing duration
+        const amount =
+            Number(tutorPricing.amount) *
+            (durationMinutes /
+                tutorPricing.durationMinutes);
 
         // Create booking + session
         const booking =

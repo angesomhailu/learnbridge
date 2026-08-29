@@ -438,7 +438,6 @@ model Booking {
 
   @@index([studentId, startTime])
   @@index([tutorId, startTime])
-  amount Decimal @db.Decimal(10, 2)
 }
 
 model Session {
