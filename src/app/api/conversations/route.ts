@@ -57,7 +57,6 @@ export async function GET() {
                     id: conv.id,
                     status: conv.status,
                     createdAt: conv.createdAt,
-                    updatedAt: conv.updatedAt,
                     creatorId: conv.creatorId,
                     participants: conv.participants.map((p) => p.user),
                     latestMessage,
