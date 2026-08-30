@@ -145,7 +145,7 @@ export async function POST(
 
         const { content } = result.data;
 
-        // Post message & update conversation's updatedAt
+        // Post message
         const message = await prisma.$transaction(async (tx) => {
             const msg = await tx.message.create({
                 data: {
@@ -162,11 +162,6 @@ export async function POST(
                         },
                     },
                 },
-            });
-
-            await tx.conversation.update({
-                where: { id: conversationId },
-                data: { updatedAt: new Date() },
             });
 
             return msg;
