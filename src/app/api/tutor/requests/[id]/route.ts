@@ -100,16 +100,49 @@ export async function PATCH(
             );
         }
 
-        const updatedRequest =
-            await prisma.tutorRequest.update({
-                where: {
-                    id,
-                },
-
-                data: {
-                    status,
-                },
+        const updatedRequest = await prisma.$transaction(async (tx) => {
+            const req = await tx.tutorRequest.update({
+                where: { id },
+                data: { status },
             });
+
+            if (status === "ACCEPTED" && req.studentId) {
+                const studentProfile = await tx.studentProfile.findUnique({
+                    where: { id: req.studentId },
+                    select: { userId: true },
+                });
+
+                let parentProfile = null;
+                if (req.parentId) {
+                    parentProfile = await tx.parentProfile.findUnique({
+                        where: { id: req.parentId },
+                        select: { userId: true },
+                    });
+                }
+
+                if (studentProfile) {
+                    const participantUserIds = [
+                        tutor.userId,
+                        studentProfile.userId,
+                        ...(parentProfile ? [parentProfile.userId] : []),
+                    ];
+
+                    await tx.conversation.create({
+                        data: {
+                            creatorId: tutor.userId,
+                            status: "OPEN",
+                            participants: {
+                                create: participantUserIds.map((userId) => ({
+                                    userId,
+                                })),
+                            },
+                        },
+                    });
+                }
+            }
+
+            return req;
+        });
 
         return NextResponse.json({
             success: true,

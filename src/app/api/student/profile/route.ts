@@ -3,6 +3,8 @@ import { z } from "zod";
 
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
+import { calculateAge } from "@/lib/utils/age";
+import { appConfig } from "@/lib/config";
 
 const updateProfileSchema = z.object({
     dateOfBirth: z.coerce.date().optional(),
@@ -141,7 +143,7 @@ export async function PATCH(request: Request) {
             );
         }
 
-        const data = result.data;
+        const inputData = result.data;
 
         const existingProfile = await prisma.studentProfile.findUnique({
             where: {
@@ -159,11 +161,17 @@ export async function PATCH(request: Request) {
             );
         }
 
+        const updateData: any = { ...inputData };
+        if (inputData.dateOfBirth) {
+            const age = calculateAge(new Date(inputData.dateOfBirth));
+            updateData.independentRequestEligible = age >= appConfig.independentRequestAgeThreshold;
+        }
+
         const profile = await prisma.studentProfile.update({
             where: {
                 userId: session.user.id,
             },
-            data,
+            data: updateData,
             include: {
                 user: {
                     select: {

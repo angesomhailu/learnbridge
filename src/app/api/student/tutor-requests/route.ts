@@ -41,6 +41,17 @@ export async function POST(
             );
         }
 
+        if (!user.student.independentRequestEligible) {
+            return NextResponse.json(
+                {
+                    success: false,
+                    message:
+                        "You must be at least 16 years old to request a tutor. Please have your parent request a tutor for you.",
+                },
+                { status: 403 }
+            );
+        }
+
         const body = await request.json();
 
         const {
