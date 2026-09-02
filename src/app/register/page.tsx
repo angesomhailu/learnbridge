@@ -6,7 +6,7 @@ import Link from "next/link";
 
 export default function RegisterPage() {
     const router = useRouter();
-
+    const [phone, setPhone] = useState("");
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [role, setRole] = useState("STUDENT");
@@ -130,11 +130,32 @@ export default function RegisterPage() {
                             required
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
-                            placeholder="e.g. user@example.com"
+                            placeholder="XXXXXXX@gmail.com"
+                            pattern="^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"
+                            title="Enter a valid email address"
                             className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-white placeholder-slate-600 focus:outline-none focus:border-indigo-500/80 transition-colors text-sm"
                         />
                     </div>
+                    <div>
+                        <label className="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2">
+                            Phone Number
+                        </label>
 
+                        <input
+                            type="tel"
+                            required
+                            value={phone}
+                            onChange={(e) => setPhone(e.target.value)}
+                            placeholder="+251 9XX XXX XXX"
+                            pattern="^\+2519[0-9]{8}$"
+                            title="Enter an Ethiopian phone number, for example +251912345678"
+                            className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-white placeholder-slate-600 focus:outline-none focus:border-indigo-500/80 transition-colors text-sm"
+                        />
+
+                        <p className="text-[11px] text-slate-500 mt-1.5">
+                            We will send a verification code to this number.
+                        </p>
+                    </div>
                     <div>
                         <label className="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2">
                             Password

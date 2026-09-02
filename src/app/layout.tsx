@@ -5,6 +5,9 @@ import "./globals.css";
 export const metadata: Metadata = {
   title: "LearnBridge",
   description: "Tutor-Student Matching and Personalized Learning Platform",
+  icons: {
+    icon: "/learnbridge.png",
+  },
 };
 
 export default function RootLayout({

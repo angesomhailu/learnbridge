@@ -7,8 +7,8 @@ import Link from "next/link";
 
 export default function LoginPage() {
     const router = useRouter();
-
-    const [email, setEmail] = useState("");
+    const [identifier, setIdentifier] = useState("");
+    //const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
 
     const [error, setError] = useState("");
@@ -21,7 +21,7 @@ export default function LoginPage() {
         setLoading(true);
 
         const result = await signIn("credentials", {
-            email,
+            identifier,
             password,
             redirect: false,
         });
@@ -29,7 +29,9 @@ export default function LoginPage() {
         setLoading(false);
 
         if (!result || result.error) {
-            setError("Invalid email or password. Please verify credentials.");
+            setError(
+                "Invalid email/phone number or password. Please check your credentials."
+            );
             return;
         }
 
@@ -72,18 +74,27 @@ export default function LoginPage() {
 
                 <form onSubmit={handleSubmit} className="space-y-4">
                     <div>
-                        <label htmlFor="email" className="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2">
-                            Email Address
+                        <label
+                            htmlFor="identifier"
+                            className="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2"
+                        >
+                            Email or Phone Number
                         </label>
+
                         <input
-                            id="email"
-                            type="email"
-                            value={email}
-                            onChange={(event) => setEmail(event.target.value)}
-                            placeholder="e.g. parent@example.com"
+                            id="identifier"
+                            type="text"
+                            value={identifier}
+                            onChange={(event) => setIdentifier(event.target.value)}
+                            placeholder="XXXXXXX@gmail.com or +2519XXXXXXXX"
                             required
+                            autoComplete="username"
                             className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-white placeholder-slate-600 focus:outline-none focus:border-indigo-500/80 transition-colors text-sm"
                         />
+
+                        <p className="text-[11px] text-slate-500 mt-1.5">
+                            You can sign in using your email address or phone number.
+                        </p>
                     </div>
 
                     <div>
