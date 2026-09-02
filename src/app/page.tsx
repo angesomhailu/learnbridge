@@ -1,19 +1,27 @@
 import Link from "next/link";
-
+import Image from "next/image";
 export default function Home() {
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100 font-sans flex flex-col justify-between selection:bg-indigo-500 selection:text-white">
       {/* Elegant Header Navbar */}
       <header className="border-b border-slate-900 bg-slate-950/80 backdrop-blur-md sticky top-0 z-50">
         <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-blue-600 to-indigo-600 flex items-center justify-center font-bold text-lg text-white shadow-lg shadow-indigo-500/25">
-              L
+          <Link href="/" className="flex items-center gap-3">
+            <div className="h-10 w-10 overflow-hidden rounded-full bg-gradient-to-tr from-blue-600 to-indigo-600 shadow-lg shadow-indigo-500/25">
+              <Image
+                src="/learnbridge.png"
+                alt="LearnBridge Logo"
+                width={40}
+                height={40}
+                className="h-full w-full object-cover"
+                priority
+              />
             </div>
+
             <span className="font-bold text-xl tracking-tight bg-gradient-to-r from-white to-slate-400 bg-clip-text text-transparent">
               LearnBridge
             </span>
-          </div>
+          </Link>
 
           <nav className="hidden md:flex items-center gap-8 text-sm font-medium text-slate-400">
             <a href="#features" className="hover:text-white transition-colors">Features</a>
@@ -24,7 +32,7 @@ export default function Home() {
           <div className="flex items-center gap-4">
             <Link
               href="/login"
-              className="text-sm font-medium text-slate-300 hover:text-white transition-colors"
+              className="text-sm font-medium bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white px-5 py-2 rounded-xl transition-all shadow-md shadow-indigo-600/20 active:scale-95"
             >
               Sign In
             </Link>
@@ -32,22 +40,22 @@ export default function Home() {
               href="/register"
               className="text-sm font-medium bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white px-5 py-2 rounded-xl transition-all shadow-md shadow-indigo-600/20 active:scale-95"
             >
-              Join Free
+              Register
             </Link>
           </div>
         </div>
-      </header>
+      </header >
 
       {/* Hero Banner Section */}
-      <main className="flex-grow flex flex-col justify-center">
+      < main className="flex-grow flex flex-col justify-center" >
         <section className="relative overflow-hidden pt-24 pb-20">
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_30%,rgba(59,130,246,0.08),transparent_40%)]" />
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_70%_70%,rgba(99,102,241,0.08),transparent_40%)]" />
 
           <div className="max-w-4xl mx-auto px-6 text-center flex flex-col items-center">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-slate-900 border border-slate-800 text-xs font-semibold text-indigo-400 mb-6 uppercase tracking-wider">
+            {/* <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-slate-900 border border-slate-800 text-xs font-semibold text-indigo-400 mb-6 uppercase tracking-wider">
               ✨ Smart AI-Assisted tutor matches
-            </div>
+            </div> */}
 
             <h1 className="text-4xl md:text-6xl font-bold tracking-tight text-white leading-tight max-w-3xl">
               Tutoring Brokerage Built for{" "}
@@ -123,10 +131,10 @@ export default function Home() {
             </div>
           </div>
         </section>
-      </main>
+      </main >
 
       {/* Footer */}
-      <footer className="border-t border-slate-900 py-8 bg-slate-950 text-slate-500 text-center text-xs">
+      < footer className="border-t border-slate-900 py-8 bg-slate-950 text-slate-500 text-center text-xs" >
         <div className="max-w-6xl mx-auto px-6 flex flex-col md:flex-row items-center justify-between gap-4">
           <span>© {new Date().getFullYear()} LearnBridge Inc. All rights reserved.</span>
           <div className="flex gap-6">
@@ -135,7 +143,7 @@ export default function Home() {
             <a href="#" className="hover:text-slate-300 transition-colors">Support Portal</a>
           </div>
         </div>
-      </footer>
-    </div>
+      </footer >
+    </div >
   );
 }

@@ -1,134 +1,260 @@
-import { NextResponse } from "next/server";
-import { z } from "zod";
 
+import { NextResponse } from "next/server";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 
-const reviewSchema = z.object({
-    tutorId: z.string().min(1, "Tutor ID is required"),
-    studentId: z.string().min(1, "Student ID is required"),
-    rating: z.coerce.number().int().min(1).max(5, "Rating must be between 1 and 5"),
-    comment: z.string().optional().nullable(),
-});
+export async function GET() {
+    try {
+        const session = await auth();
+
+        if (!session?.user?.email) {
+            return NextResponse.json(
+                {
+                    success: false,
+                    message: "Unauthorized",
+                },
+                { status: 401 }
+            );
+        }
+
+        const user = await prisma.user.findUnique({
+            where: {
+                email: session.user.email,
+            },
+            include: {
+                student: true,
+            },
+        });
+
+        if (!user?.student) {
+            return NextResponse.json(
+                {
+                    success: false,
+                    message: "Student profile not found",
+                },
+                { status: 404 }
+            );
+        }
+
+        const reviews = await prisma.review.findMany({
+            where: {
+                studentId: user.student.id,
+            },
+            include: {
+                tutor: {
+                    include: {
+                        user: {
+                            select: {
+                                email: true,
+                            },
+                        },
+                    },
+                },
+            },
+            orderBy: {
+                createdAt: "desc",
+            },
+        });
+
+        return NextResponse.json({
+            success: true,
+            reviews,
+        });
+    } catch (error) {
+        console.error("Get student reviews error:", error);
+
+        return NextResponse.json(
+            {
+                success: false,
+                message: "Failed to retrieve reviews",
+            },
+            { status: 500 }
+        );
+    }
+}
 
 export async function POST(request: Request) {
     try {
         const session = await auth();
 
-        if (!session?.user?.id) {
+        if (!session?.user?.email) {
             return NextResponse.json(
-                { success: false, message: "Authentication required" },
+                {
+                    success: false,
+                    message: "Unauthorized",
+                },
                 { status: 401 }
             );
         }
 
         const body = await request.json();
-        const result = reviewSchema.safeParse(body);
 
-        if (!result.success) {
+        const {
+            tutorId,
+            rating,
+            comment,
+        } = body;
+
+        if (!tutorId || !rating) {
             return NextResponse.json(
                 {
                     success: false,
-                    message: "Invalid review input",
-                    errors: result.error.flatten().fieldErrors,
+                    message:
+                        "Tutor and rating are required",
                 },
                 { status: 400 }
             );
         }
 
-        const { tutorId, studentId, rating, comment } = result.data;
+        const numericRating = Number(rating);
 
-        // Verify that current user is authorized to review for this studentId
-        let isAuthorized = false;
-
-        if (session.user.role === "STUDENT") {
-            const studentProfile = await prisma.studentProfile.findUnique({
-                where: { userId: session.user.id },
-            });
-            if (studentProfile && studentProfile.id === studentId) {
-                isAuthorized = true;
-            }
-        } else if (session.user.role === "PARENT") {
-            const parentProfile = await prisma.parentProfile.findUnique({
-                where: { userId: session.user.id },
-            });
-            if (parentProfile) {
-                const relation = await prisma.parentStudent.findUnique({
-                    where: {
-                        parentId_studentId: {
-                            parentId: parentProfile.id,
-                            studentId,
-                        },
-                    },
-                });
-                if (relation) {
-                    isAuthorized = true;
-                }
-            }
-        }
-
-        if (!isAuthorized) {
+        if (
+            !Number.isInteger(numericRating) ||
+            numericRating < 1 ||
+            numericRating > 5
+        ) {
             return NextResponse.json(
-                { success: false, message: "You are not authorized to write reviews for this student profile" },
-                { status: 403 }
+                {
+                    success: false,
+                    message:
+                        "Rating must be between 1 and 5",
+                },
+                { status: 400 }
             );
         }
 
-        // Verify tutor exists
-        const tutor = await prisma.tutorProfile.findUnique({
-            where: { id: tutorId },
+        const user = await prisma.user.findUnique({
+            where: {
+                email: session.user.email,
+            },
+            include: {
+                student: true,
+            },
         });
 
-        if (!tutor) {
+        if (!user?.student) {
             return NextResponse.json(
-                { success: false, message: "Tutor not found" },
+                {
+                    success: false,
+                    message:
+                        "Student profile not found",
+                },
                 { status: 404 }
             );
         }
 
-        // Enforce completed booking check: must have at least one COMPLETED booking with the tutor
-        const completedBooking = await prisma.booking.findFirst({
+        const tutor = await prisma.tutorProfile.findUnique({
             where: {
-                studentId,
-                tutorId,
-                status: "COMPLETED",
+                id: tutorId,
             },
         });
 
-        if (!completedBooking) {
+        if (!tutor) {
             return NextResponse.json(
                 {
                     success: false,
-                    message: "You can only review a tutor after completing at least one scheduled class session with them.",
+                    message: "Tutor not found",
                 },
-                { status: 400 }
+                { status: 404 }
             );
         }
 
-        // Create review and publish it directly
-        const review = await prisma.review.create({
-            data: {
-                tutorId,
-                studentId,
-                authorId: session.user.id,
-                rating,
-                comment: comment || null,
-                status: "PUBLISHED", // Auto-publish for direct testing feedback
-            },
-        });
+        // Check whether the student completed
+        // at least one session with this tutor
+        const completedSession =
+            await prisma.session.findFirst({
+                where: {
+                    status: "COMPLETED",
+
+                    booking: {
+                        studentId: user.student.id,
+                        tutorId,
+                    },
+                },
+            });
+
+        if (!completedSession) {
+            return NextResponse.json(
+                {
+                    success: false,
+                    message:
+                        "You can only review a tutor after completing a session",
+                },
+                { status: 403 }
+            );
+        }
+
+        // Prevent duplicate review
+        const existingReview =
+            await prisma.review.findFirst({
+                where: {
+                    tutorId,
+                    studentId: user.student.id,
+                },
+            });
+
+        if (existingReview) {
+            return NextResponse.json(
+                {
+                    success: false,
+                    message:
+                        "You have already reviewed this tutor",
+                },
+                { status: 409 }
+            );
+        }
+
+        const review =
+            await prisma.review.create({
+                data: {
+                    tutorId,
+
+                    studentId:
+                        user.student.id,
+
+                    authorId: user.id,
+
+                    rating: numericRating,
+
+                    comment:
+                        comment?.trim() || null,
+
+                    status: "PENDING",
+                },
+                include: {
+                    tutor: {
+                        include: {
+                            user: {
+                                select: {
+                                    email: true,
+                                },
+                            },
+                        },
+                    },
+                },
+            });
 
         return NextResponse.json(
             {
                 success: true,
-                message: "Review submitted and published successfully",
+                message:
+                    "Review submitted successfully",
                 review,
             },
             { status: 201 }
         );
     } catch (error) {
-        console.error("Create review error:", error);
+        console.error(
+            "Create review error:",
+            error
+        );
+
         return NextResponse.json(
-            { success: false, message: "Failed to submit review" },
+            {
+                success: false,
+                message:
+                    "Failed to create review",
+            },
             { status: 500 }
         );
     }

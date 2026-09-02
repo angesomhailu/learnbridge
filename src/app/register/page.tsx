@@ -1,5 +1,5 @@
 "use client";
-
+import Image from "next/image";
 import { FormEvent, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
@@ -76,12 +76,24 @@ export default function RegisterPage() {
 
             <div className="w-full max-w-md bg-slate-900/40 border border-slate-900 p-8 rounded-2xl backdrop-blur-xl shadow-2xl relative z-10">
                 <div className="mb-6 text-center">
-                    <Link href="/" className="inline-flex items-center gap-3 mb-4">
-                        <div className="w-8 h-8 rounded-lg bg-gradient-to-tr from-blue-600 to-indigo-600 flex items-center justify-center font-bold text-sm text-white">
-                            L
-                        </div>
-                        <span className="font-bold text-lg text-white">LearnBridge</span>
-                    </Link>
+                    <div className="flex items-center pl-25 pb-10">
+                        <Link href="/" className="flex items-center gap-3">
+                            <div className="h-10 w-10 overflow-hidden rounded-full bg-gradient-to-tr from-blue-600 to-indigo-600 shadow-lg shadow-indigo-500/25">
+                                <Image
+                                    src="/learnbridge.png"
+                                    alt="LearnBridge Logo"
+                                    width={40}
+                                    height={40}
+                                    className="h-full w-full object-cover"
+                                    priority
+                                />
+                            </div>
+
+                            <span className="font-bold text-xl tracking-tight bg-gradient-to-r from-white to-slate-400 bg-clip-text text-transparent">
+                                LearnBridge
+                            </span>
+                        </Link>
+                    </div>
                     <h1 className="text-2xl font-bold text-white tracking-tight">
                         Create Account
                     </h1>
@@ -165,8 +177,8 @@ export default function RegisterPage() {
 
                     {message && (
                         <div className={`border px-4 py-2.5 rounded-xl text-xs flex items-center gap-2 ${isSuccess
-                                ? "bg-green-500/10 border-green-500/20 text-green-400"
-                                : "bg-red-500/10 border-red-500/20 text-red-400"
+                            ? "bg-green-500/10 border-green-500/20 text-green-400"
+                            : "bg-red-500/10 border-red-500/20 text-red-400"
                             }`}>
                             <span>{isSuccess ? "✓" : "⚠"}</span>
                             <span>{message}</span>
