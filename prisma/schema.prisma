@@ -126,7 +126,7 @@ model User {
 model StudentProfile {
   id     String @id @default(cuid())
   userId String @unique
-
+phone String?
   dateOfBirth DateTime
   gender      Gender
   grade       String
@@ -165,6 +165,7 @@ model StudentProfile {
 model ParentProfile {
   id     String @id @default(cuid())
   userId String @unique
+  phone String?
 
   dateOfBirth DateTime?
   gender      Gender?
@@ -202,6 +203,7 @@ model ParentStudent {
 model TutorProfile {
   id     String @id @default(cuid())
   userId String @unique
+  phone String?
 
   dateOfBirth DateTime
   gender      Gender
