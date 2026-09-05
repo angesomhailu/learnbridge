@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { GraduationCap, Plus, Trash2, CheckCircle2, Building, Calendar, Award } from "lucide-react";
 
 type Education = {
     id: string;
@@ -12,12 +13,10 @@ type Education = {
 
 export default function TutorEducation() {
     const [education, setEducation] = useState<Education[]>([]);
-
     const [institution, setInstitution] = useState("");
     const [degree, setDegree] = useState("");
     const [department, setDepartment] = useState("");
     const [graduationYear, setGraduationYear] = useState("");
-
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
     const [message, setMessage] = useState("");
@@ -26,16 +25,11 @@ export default function TutorEducation() {
         try {
             const response = await fetch("/api/tutor/education");
             const data = await response.json();
-
-            if (!response.ok) {
-                setMessage(data.message || "Failed to load education.");
-                return;
+            if (response.ok && data.success) {
+                setEducation(data.education || []);
             }
-
-            setEducation(data.education || []);
         } catch (error) {
             console.error(error);
-            setMessage("Failed to load education records.");
         } finally {
             setLoading(false);
         }
@@ -47,7 +41,7 @@ export default function TutorEducation() {
 
     async function addEducation() {
         if (!institution || !degree) {
-            setMessage("Institution and degree are required.");
+            setMessage("Institution name and degree are required.");
             return;
         }
 
@@ -57,9 +51,7 @@ export default function TutorEducation() {
         try {
             const response = await fetch("/api/tutor/education", {
                 method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
+                headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
                     institution,
                     degree,
@@ -70,22 +62,19 @@ export default function TutorEducation() {
 
             const data = await response.json();
 
-            if (!response.ok) {
+            if (response.ok) {
+                setMessage("Academic qualification record added successfully!");
+                setInstitution("");
+                setDegree("");
+                setDepartment("");
+                setGraduationYear("");
+                await loadEducation();
+                setTimeout(() => setMessage(""), 3000);
+            } else {
                 setMessage(data.message || "Failed to add education.");
-                return;
             }
-
-            setMessage("Education record added successfully.");
-
-            setInstitution("");
-            setDegree("");
-            setDepartment("");
-            setGraduationYear("");
-
-            await loadEducation();
         } catch (error) {
             console.error(error);
-            setMessage("Something went wrong.");
         } finally {
             setSaving(false);
         }
@@ -93,173 +82,162 @@ export default function TutorEducation() {
 
     async function deleteEducation(id: string) {
         try {
-            const response = await fetch(
-                `/api/tutor/education/${id}`,
-                {
-                    method: "DELETE",
-                }
-            );
-
-            const data = await response.json();
-
-            if (!response.ok) {
-                setMessage(data.message || "Failed to delete record.");
-                return;
+            const response = await fetch(`/api/tutor/education/${id}`, {
+                method: "DELETE",
+            });
+            if (response.ok) {
+                setMessage("Education record deleted.");
+                await loadEducation();
+                setTimeout(() => setMessage(""), 3000);
             }
-
-            setMessage("Education record deleted.");
-
-            await loadEducation();
         } catch (error) {
             console.error(error);
-            setMessage("Something went wrong.");
         }
     }
 
     if (loading) {
-        return <p>Loading education records...</p>;
+        return (
+            <div className="flex justify-center py-12">
+                <div className="h-7 w-7 animate-spin rounded-full border-4 border-emerald-600 border-t-transparent"></div>
+            </div>
+        );
     }
 
     return (
         <div className="space-y-8">
             {message && (
-                <div className="rounded-lg border p-4">
+                <div className="rounded-xl border border-emerald-200 bg-emerald-50 p-4 text-xs font-semibold text-emerald-800 flex items-center gap-2">
+                    <CheckCircle2 className="h-4 w-4 text-emerald-600" />
                     {message}
                 </div>
             )}
 
-            {/* Add education */}
-            <section className="rounded-xl border p-6">
-                <h2 className="text-xl font-semibold">
-                    Add Education
+            {/* Form */}
+            <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm space-y-4">
+                <h2 className="text-base font-bold text-slate-900 flex items-center gap-2">
+                    <Plus className="h-5 w-5 text-emerald-600" />
+                    Add Degree or Certification
                 </h2>
 
-                <div className="mt-5 space-y-4">
-                    <div>
-                        <label className="mb-2 block font-medium">
-                            Institution
-                        </label>
-
+                <div className="grid gap-4 md:grid-cols-2">
+                    <div className="space-y-1">
+                        <label className="text-xs font-semibold text-slate-700">Institution Name</label>
                         <input
                             type="text"
                             value={institution}
-                            onChange={(e) =>
-                                setInstitution(e.target.value)
-                            }
-                            placeholder="Example: Mekelle University"
-                            className="w-full rounded-lg border p-3"
+                            onChange={(e) => setInstitution(e.target.value)}
+                            placeholder="e.g. Mekelle University / Addis Ababa University"
+                            className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs text-slate-900 focus:outline-none focus:ring-2 focus:ring-emerald-500"
                         />
                     </div>
 
-                    <div>
-                        <label className="mb-2 block font-medium">
-                            Degree
-                        </label>
-
+                    <div className="space-y-1">
+                        <label className="text-xs font-semibold text-slate-700">Degree / Diploma Title</label>
                         <input
                             type="text"
                             value={degree}
                             onChange={(e) => setDegree(e.target.value)}
-                            placeholder="Example: BSc Software Engineering"
-                            className="w-full rounded-lg border p-3"
+                            placeholder="e.g. BSc Computer Science / Bed Mathematics"
+                            className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs text-slate-900 focus:outline-none focus:ring-2 focus:ring-emerald-500"
                         />
                     </div>
 
-                    <div>
-                        <label className="mb-2 block font-medium">
-                            Department
-                        </label>
-
+                    <div className="space-y-1">
+                        <label className="text-xs font-semibold text-slate-700">Department / Major</label>
                         <input
                             type="text"
                             value={department}
-                            onChange={(e) =>
-                                setDepartment(e.target.value)
-                            }
-                            placeholder="Example: Software Engineering"
-                            className="w-full rounded-lg border p-3"
+                            onChange={(e) => setDepartment(e.target.value)}
+                            placeholder="e.g. Electrical Engineering & Computing"
+                            className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs text-slate-900 focus:outline-none focus:ring-2 focus:ring-emerald-500"
                         />
                     </div>
 
-                    <div>
-                        <label className="mb-2 block font-medium">
-                            Graduation Year
-                        </label>
-
+                    <div className="space-y-1">
+                        <label className="text-xs font-semibold text-slate-700">Graduation Year</label>
                         <input
                             type="number"
                             min="1900"
                             max={new Date().getFullYear() + 10}
                             value={graduationYear}
-                            onChange={(e) =>
-                                setGraduationYear(e.target.value)
-                            }
-                            placeholder="Example: 2026"
-                            className="w-full rounded-lg border p-3"
+                            onChange={(e) => setGraduationYear(e.target.value)}
+                            placeholder="e.g. 2024"
+                            className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs text-slate-900 focus:outline-none focus:ring-2 focus:ring-emerald-500"
                         />
                     </div>
+                </div>
 
+                <div className="flex justify-end pt-2">
                     <button
                         type="button"
                         onClick={addEducation}
                         disabled={saving}
-                        className="rounded-lg bg-black px-6 py-3 font-medium text-white disabled:opacity-50"
+                        className="inline-flex items-center gap-2 rounded-xl bg-emerald-600 px-5 py-2.5 text-xs font-bold text-white hover:bg-emerald-700 disabled:opacity-50 transition shadow-xs"
                     >
-                        {saving
-                            ? "Adding..."
-                            : "Add Education"}
+                        <Plus className="h-4 w-4" />
+                        {saving ? "Saving..." : "Add Education Record"}
                     </button>
                 </div>
             </section>
 
-            {/* Existing education */}
-            <section>
-                <h2 className="mb-4 text-xl font-semibold">
-                    Education History
+            {/* List */}
+            <section className="space-y-4">
+                <h2 className="text-base font-bold text-slate-900 flex items-center gap-2">
+                    <GraduationCap className="h-5 w-5 text-emerald-600" />
+                    Academic Credentials & Degrees
                 </h2>
 
                 {education.length === 0 ? (
-                    <div className="rounded-xl border p-6 text-gray-600">
-                        No education records added yet.
+                    <div className="rounded-2xl border border-slate-200 bg-white p-8 text-center space-y-2">
+                        <GraduationCap className="h-10 w-10 text-slate-300 mx-auto" />
+                        <h3 className="text-sm font-bold text-slate-900">No education records added yet</h3>
+                        <p className="text-xs text-slate-500 max-w-sm mx-auto">
+                            Add your university degrees, diplomas, or teaching credentials above.
+                        </p>
                     </div>
                 ) : (
-                    <div className="space-y-4">
+                    <div className="grid gap-4 sm:grid-cols-2">
                         {education.map((item) => (
                             <div
                                 key={item.id}
-                                className="flex items-center justify-between rounded-xl border p-5"
+                                className="rounded-2xl border border-slate-200 bg-white p-5 shadow-xs hover:shadow-md transition space-y-3 flex flex-col justify-between"
                             >
-                                <div>
-                                    <h3 className="font-semibold">
-                                        {item.degree}
-                                    </h3>
+                                <div className="space-y-2">
+                                    <div className="flex items-start justify-between">
+                                        <div className="space-y-0.5">
+                                            <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-600">
+                                                Degree / Certificate
+                                            </span>
+                                            <h3 className="font-bold text-sm text-slate-900">{item.degree}</h3>
+                                        </div>
+                                        {item.graduationYear && (
+                                            <span className="bg-slate-100 text-slate-700 text-[10px] font-extrabold px-2.5 py-0.5 rounded-full">
+                                                {item.graduationYear}
+                                            </span>
+                                        )}
+                                    </div>
 
-                                    <p className="text-gray-600">
-                                        {item.institution}
-                                    </p>
-
-                                    {item.department && (
-                                        <p className="text-sm text-gray-500">
-                                            {item.department}
+                                    <div className="space-y-1 text-xs text-slate-600">
+                                        <p className="flex items-center gap-1.5 font-semibold text-slate-800">
+                                            <Building className="h-3.5 w-3.5 text-slate-400" />
+                                            {item.institution}
                                         </p>
-                                    )}
-
-                                    {item.graduationYear && (
-                                        <p className="mt-1 text-sm text-gray-500">
-                                            Graduated: {item.graduationYear}
-                                        </p>
-                                    )}
+                                        {item.department && (
+                                            <p className="text-slate-500 text-[11px] pl-5">{item.department}</p>
+                                        )}
+                                    </div>
                                 </div>
 
-                                <button
-                                    type="button"
-                                    onClick={() =>
-                                        deleteEducation(item.id)
-                                    }
-                                    className="rounded-lg border px-4 py-2 text-sm"
-                                >
-                                    Delete
-                                </button>
+                                <div className="pt-3 border-t border-slate-100 flex justify-end">
+                                    <button
+                                        type="button"
+                                        onClick={() => deleteEducation(item.id)}
+                                        className="inline-flex items-center gap-1 text-xs font-semibold text-rose-600 hover:bg-rose-50 px-3 py-1 rounded-lg transition"
+                                    >
+                                        <Trash2 className="h-3.5 w-3.5" />
+                                        Remove Record
+                                    </button>
+                                </div>
                             </div>
                         ))}
                     </div>

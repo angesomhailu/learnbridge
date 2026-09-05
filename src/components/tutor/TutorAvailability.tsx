@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { Clock, Plus, Trash2, CheckCircle2, AlertCircle, Calendar } from "lucide-react";
 
 type Availability = {
     id: string;
@@ -20,37 +21,23 @@ const days = [
 ];
 
 export default function TutorAvailability() {
-    const [availability, setAvailability] =
-        useState<Availability[]>([]);
-
+    const [availability, setAvailability] = useState<Availability[]>([]);
     const [dayOfWeek, setDayOfWeek] = useState("1");
     const [startTime, setStartTime] = useState("09:00");
     const [endTime, setEndTime] = useState("17:00");
-
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
     const [message, setMessage] = useState("");
 
     async function loadAvailability() {
         try {
-            const response = await fetch(
-                "/api/tutor/availability"
-            );
-
+            const response = await fetch("/api/tutor/availability");
             const data = await response.json();
-
-            if (!response.ok) {
-                setMessage(
-                    data.message ||
-                    "Failed to load availability."
-                );
-                return;
+            if (response.ok && data.success) {
+                setAvailability(data.availability || []);
             }
-
-            setAvailability(data.availability || []);
         } catch (error) {
             console.error(error);
-            setMessage("Failed to load availability.");
         } finally {
             setLoading(false);
         }
@@ -65,39 +52,25 @@ export default function TutorAvailability() {
         setMessage("");
 
         try {
-            const response = await fetch(
-                "/api/tutor/availability",
-                {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                    },
-                    body: JSON.stringify({
-                        dayOfWeek: Number(dayOfWeek),
-                        startTime,
-                        endTime,
-                    }),
-                }
-            );
-
+            const response = await fetch("/api/tutor/availability", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    dayOfWeek: Number(dayOfWeek),
+                    startTime,
+                    endTime,
+                }),
+            });
             const data = await response.json();
-
-            if (!response.ok) {
-                setMessage(
-                    data.message ||
-                    "Failed to add availability."
-                );
-                return;
+            if (response.ok) {
+                setMessage("Availability slot added successfully!");
+                await loadAvailability();
+                setTimeout(() => setMessage(""), 3000);
+            } else {
+                setMessage(data.message || "Failed to add availability.");
             }
-
-            setMessage(
-                "Availability added successfully."
-            );
-
-            await loadAvailability();
         } catch (error) {
             console.error(error);
-            setMessage("Something went wrong.");
         } finally {
             setSaving(false);
         }
@@ -105,153 +78,129 @@ export default function TutorAvailability() {
 
     async function removeAvailability(id: string) {
         try {
-            const response = await fetch(
-                `/api/tutor/availability/${id}`,
-                {
-                    method: "DELETE",
-                }
-            );
-
-            const data = await response.json();
-
-            if (!response.ok) {
-                setMessage(
-                    data.message ||
-                    "Failed to remove availability."
-                );
-                return;
+            const response = await fetch(`/api/tutor/availability/${id}`, {
+                method: "DELETE",
+            });
+            if (response.ok) {
+                setMessage("Availability slot removed.");
+                await loadAvailability();
+                setTimeout(() => setMessage(""), 3000);
             }
-
-            setMessage(
-                "Availability removed successfully."
-            );
-
-            await loadAvailability();
         } catch (error) {
             console.error(error);
-            setMessage("Something went wrong.");
         }
     }
 
     if (loading) {
-        return <p>Loading availability...</p>;
+        return (
+            <div className="flex justify-center py-12">
+                <div className="h-7 w-7 animate-spin rounded-full border-4 border-emerald-600 border-t-transparent"></div>
+            </div>
+        );
     }
 
     return (
         <div className="space-y-8">
             {message && (
-                <div className="rounded-lg border p-4">
+                <div className="rounded-xl border border-emerald-200 bg-emerald-50 p-4 text-xs font-semibold text-emerald-800 flex items-center gap-2">
+                    <CheckCircle2 className="h-4 w-4 text-emerald-600" />
                     {message}
                 </div>
             )}
 
-            <section className="rounded-xl border p-6">
-                <h2 className="text-xl font-semibold">
-                    Add Availability
+            {/* Add Availability Slot Form */}
+            <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm space-y-4">
+                <h2 className="text-base font-bold text-slate-900 flex items-center gap-2">
+                    <Plus className="h-5 w-5 text-emerald-600" />
+                    Add Weekly Teaching Slot
                 </h2>
 
-                <div className="mt-5 grid gap-4 md:grid-cols-3">
-                    <div>
-                        <label className="mb-2 block font-medium">
-                            Day
-                        </label>
-
+                <div className="grid gap-4 md:grid-cols-3">
+                    <div className="space-y-1">
+                        <label className="text-xs font-semibold text-slate-700">Day of Week</label>
                         <select
                             value={dayOfWeek}
-                            onChange={(e) =>
-                                setDayOfWeek(e.target.value)
-                            }
-                            className="w-full rounded-lg border p-3"
+                            onChange={(e) => setDayOfWeek(e.target.value)}
+                            className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs text-slate-900 focus:outline-none focus:ring-2 focus:ring-emerald-500"
                         >
                             {days.map((day, index) => (
-                                <option
-                                    key={day}
-                                    value={index}
-                                >
+                                <option key={day} value={index}>
                                     {day}
                                 </option>
                             ))}
                         </select>
                     </div>
 
-                    <div>
-                        <label className="mb-2 block font-medium">
-                            Start Time
-                        </label>
-
+                    <div className="space-y-1">
+                        <label className="text-xs font-semibold text-slate-700">Start Time</label>
                         <input
                             type="time"
                             value={startTime}
-                            onChange={(e) =>
-                                setStartTime(e.target.value)
-                            }
-                            className="w-full rounded-lg border p-3"
+                            onChange={(e) => setStartTime(e.target.value)}
+                            className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs text-slate-900 focus:outline-none focus:ring-2 focus:ring-emerald-500"
                         />
                     </div>
 
-                    <div>
-                        <label className="mb-2 block font-medium">
-                            End Time
-                        </label>
-
+                    <div className="space-y-1">
+                        <label className="text-xs font-semibold text-slate-700">End Time</label>
                         <input
                             type="time"
                             value={endTime}
-                            onChange={(e) =>
-                                setEndTime(e.target.value)
-                            }
-                            className="w-full rounded-lg border p-3"
+                            onChange={(e) => setEndTime(e.target.value)}
+                            className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs text-slate-900 focus:outline-none focus:ring-2 focus:ring-emerald-500"
                         />
                     </div>
                 </div>
 
-                <button
-                    type="button"
-                    onClick={addAvailability}
-                    disabled={saving}
-                    className="mt-5 rounded-lg bg-black px-6 py-3 font-medium text-white disabled:opacity-50"
-                >
-                    {saving
-                        ? "Adding..."
-                        : "Add Availability"}
-                </button>
+                <div className="flex justify-end pt-2">
+                    <button
+                        type="button"
+                        onClick={addAvailability}
+                        disabled={saving}
+                        className="inline-flex items-center gap-2 rounded-xl bg-emerald-600 px-5 py-2.5 text-xs font-bold text-white hover:bg-emerald-700 disabled:opacity-50 transition shadow-xs"
+                    >
+                        <Plus className="h-4 w-4" />
+                        {saving ? "Saving..." : "Add Time Slot"}
+                    </button>
+                </div>
             </section>
 
-            <section>
-                <h2 className="mb-4 text-xl font-semibold">
-                    My Availability
+            {/* Configured Slots List */}
+            <section className="space-y-4">
+                <h2 className="text-base font-bold text-slate-900 flex items-center gap-2">
+                    <Clock className="h-5 w-5 text-emerald-600" />
+                    Active Availability Schedule
                 </h2>
 
                 {availability.length === 0 ? (
-                    <div className="rounded-xl border p-6 text-gray-600">
-                        No availability has been added yet.
+                    <div className="rounded-2xl border border-slate-200 bg-white p-8 text-center space-y-2">
+                        <Calendar className="h-10 w-10 text-slate-300 mx-auto" />
+                        <h3 className="text-sm font-bold text-slate-900">No availability slots configured</h3>
+                        <p className="text-xs text-slate-500 max-w-sm mx-auto">
+                            Add open time slots above so students can select tutoring session times.
+                        </p>
                     </div>
                 ) : (
-                    <div className="space-y-3">
+                    <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
                         {availability.map((item) => (
                             <div
                                 key={item.id}
-                                className="flex items-center justify-between rounded-xl border p-5"
+                                className="flex items-center justify-between rounded-2xl border border-slate-200 bg-white p-4 shadow-xs hover:shadow-md transition"
                             >
-                                <div>
-                                    <p className="font-semibold">
-                                        {days[item.dayOfWeek]}
-                                    </p>
-
-                                    <p className="text-gray-600">
-                                        {item.startTime} -{" "}
-                                        {item.endTime}
+                                <div className="space-y-0.5">
+                                    <span className="text-xs font-bold text-slate-900">{days[item.dayOfWeek]}</span>
+                                    <p className="text-xs text-emerald-700 font-semibold">
+                                        {item.startTime} – {item.endTime}
                                     </p>
                                 </div>
 
                                 <button
                                     type="button"
-                                    onClick={() =>
-                                        removeAvailability(item.id)
-                                    }
-                                    className="rounded-lg border px-3 py-2 text-sm"
+                                    onClick={() => removeAvailability(item.id)}
+                                    className="p-2 text-rose-500 hover:bg-rose-50 rounded-xl transition"
+                                    title="Remove Slot"
                                 >
-                                    Remove
+                                    <Trash2 className="h-4 w-4" />
                                 </button>
                             </div>
                         ))}

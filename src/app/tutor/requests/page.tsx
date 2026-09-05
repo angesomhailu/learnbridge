@@ -1,29 +1,21 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { ClipboardList, CheckCircle2, XCircle, Clock, BookOpen, GraduationCap, School, MessageSquare } from "lucide-react";
 
 type Student = {
     id: string;
-
     user: {
         email: string;
     };
-
     grade: string;
-
     schoolName?: string | null;
-
     bio?: string | null;
-
     learningNeeds?: string | null;
-
     subjects: {
         id: string;
-
         currentLevel?: string | null;
-
         needsHelp: boolean;
-
         subject: {
             name: string;
         };
@@ -32,54 +24,28 @@ type Student = {
 
 type TutorRequest = {
     id: string;
-
     message?: string | null;
-
-    status: string;
-
+    status: "PENDING" | "ACCEPTED" | "REJECTED";
     createdAt: string;
-
     student: Student;
 };
 
 export default function TutorRequestsPage() {
-    const [requests, setRequests] =
-        useState<TutorRequest[]>([]);
-
-    const [loading, setLoading] =
-        useState(true);
-
-    const [message, setMessage] =
-        useState("");
+    const [requests, setRequests] = useState<TutorRequest[]>([]);
+    const [loading, setLoading] = useState(true);
+    const [statusFilter, setStatusFilter] = useState<"ALL" | "PENDING" | "ACCEPTED" | "REJECTED">("ALL");
+    const [alertMsg, setAlertMsg] = useState("");
 
     async function loadRequests() {
         try {
             setLoading(true);
-
-            const response = await fetch(
-                "/api/tutor/requests"
-            );
-
+            const response = await fetch("/api/tutor/requests");
             const data = await response.json();
-
-            if (!response.ok) {
-                setMessage(
-                    data.message ||
-                    "Failed to load requests."
-                );
-
-                return;
+            if (response.ok && data.success) {
+                setRequests(data.requests || []);
             }
-
-            setRequests(
-                data.requests || []
-            );
         } catch (error) {
             console.error(error);
-
-            setMessage(
-                "Failed to load tutor requests."
-            );
         } finally {
             setLoading(false);
         }
@@ -89,267 +55,183 @@ export default function TutorRequestsPage() {
         loadRequests();
     }, []);
 
-    async function updateRequest(
-        requestId: string,
-        status: "ACCEPTED" | "REJECTED"
-    ) {
+    async function updateRequest(requestId: string, status: "ACCEPTED" | "REJECTED") {
         try {
-            const response = await fetch(
-                `/api/tutor/requests/${requestId}`,
-                {
-                    method: "PATCH",
-
-                    headers: {
-                        "Content-Type":
-                            "application/json",
-                    },
-
-                    body: JSON.stringify({
-                        status,
-                    }),
-                }
-            );
-
-            const data =
-                await response.json();
-
-            if (!response.ok) {
-                alert(
-                    data.message ||
-                    "Failed to update request."
-                );
-
-                return;
+            const response = await fetch(`/api/tutor/requests/${requestId}`, {
+                method: "PATCH",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ status }),
+            });
+            const data = await response.json();
+            if (response.ok) {
+                setAlertMsg(`Request marked as ${status.toLowerCase()}!`);
+                await loadRequests();
+                setTimeout(() => setAlertMsg(""), 3000);
+            } else {
+                alert(data.message || "Failed to update request.");
             }
-
-            alert(data.message);
-
-            await loadRequests();
         } catch (error) {
             console.error(error);
-
-            alert(
-                "Something went wrong."
-            );
         }
     }
 
-    if (loading) {
-        return (
-            <main className="min-h-screen p-6">
-                <div className="mx-auto max-w-5xl">
-                    Loading requests...
-                </div>
-            </main>
-        );
-    }
+    const filtered = requests.filter((r) => {
+        if (statusFilter === "ALL") return true;
+        return r.status === statusFilter;
+    });
 
     return (
-        <main className="min-h-screen bg-gray-50 p-6">
-            <div className="mx-auto max-w-5xl">
-                <h1 className="text-3xl font-bold">
-                    Tutor Requests
-                </h1>
+        <main className="min-h-screen bg-slate-50 p-6 md:p-10 space-y-8">
+            {/* Header */}
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                <div>
+                    <h1 className="text-2xl md:text-3xl font-extrabold text-slate-900 flex items-center gap-3">
+                        <ClipboardList className="h-8 w-8 text-emerald-600" />
+                        Student Tutor Requests
+                    </h1>
+                    <p className="mt-1 text-sm text-slate-500">
+                        Review match requests from students and parents, evaluate learning needs, and confirm tutoring sessions.
+                    </p>
+                </div>
 
-                <p className="mt-2 text-gray-600">
-                    Review students who want to
-                    learn with you.
-                </p>
+                {/* Filter Tabs */}
+                <div className="flex bg-white p-1 rounded-xl border border-slate-200 shadow-xs">
+                    {(["ALL", "PENDING", "ACCEPTED", "REJECTED"] as const).map((tab) => (
+                        <button
+                            key={tab}
+                            onClick={() => setStatusFilter(tab)}
+                            className={`px-3.5 py-1.5 rounded-lg text-xs font-bold transition ${statusFilter === tab
+                                    ? "bg-emerald-600 text-white shadow-xs"
+                                    : "text-slate-500 hover:text-slate-900"
+                                }`}
+                        >
+                            {tab}
+                        </button>
+                    ))}
+                </div>
+            </div>
 
-                {message && (
-                    <div className="mt-6 rounded-lg border border-red-200 bg-red-50 p-4 text-red-700">
-                        {message}
-                    </div>
-                )}
+            {alertMsg && (
+                <div className="rounded-xl border border-emerald-200 bg-emerald-50 p-4 text-xs font-semibold text-emerald-800 flex items-center gap-2">
+                    <CheckCircle2 className="h-4 w-4 text-emerald-600" />
+                    {alertMsg}
+                </div>
+            )}
 
-                {requests.length === 0 ? (
-                    <div className="mt-8 rounded-xl border bg-white p-10 text-center">
-                        <h2 className="text-xl font-semibold">
-                            No tutor requests
-                        </h2>
+            {/* List */}
+            {loading ? (
+                <div className="flex justify-center items-center py-16">
+                    <div className="h-8 w-8 animate-spin rounded-full border-4 border-emerald-600 border-t-transparent"></div>
+                </div>
+            ) : filtered.length === 0 ? (
+                <div className="rounded-2xl border border-slate-200 bg-white p-12 text-center shadow-sm space-y-3">
+                    <ClipboardList className="mx-auto h-12 w-12 text-slate-300" />
+                    <h3 className="text-base font-bold text-slate-900">No requests match this filter</h3>
+                    <p className="text-xs text-slate-500 max-w-sm mx-auto">
+                        Student tutoring match requests will show up here once submitted by students or parents.
+                    </p>
+                </div>
+            ) : (
+                <div className="space-y-4">
+                    {filtered.map((request) => (
+                        <div
+                            key={request.id}
+                            className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm hover:shadow-md transition space-y-4"
+                        >
+                            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 pb-3">
+                                <div>
+                                    <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-600">
+                                        Student Account
+                                    </span>
+                                    <h3 className="text-base font-bold text-slate-900">{request.student.user.email}</h3>
+                                </div>
 
-                        <p className="mt-2 text-gray-600">
-                            You don't have any tutor
-                            requests yet.
-                        </p>
-                    </div>
-                ) : (
-                    <div className="mt-8 space-y-6">
-                        {requests.map(
-                            (request) => (
-                                <div
-                                    key={
-                                        request.id
-                                    }
-                                    className="rounded-xl border bg-white p-6 shadow-sm"
+                                <span
+                                    className={`inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-bold w-fit ${request.status === "ACCEPTED"
+                                            ? "bg-emerald-100 text-emerald-800"
+                                            : request.status === "PENDING"
+                                                ? "bg-amber-100 text-amber-800"
+                                                : "bg-rose-100 text-rose-800"
+                                        }`}
                                 >
-                                    <div className="flex flex-col justify-between gap-4 md:flex-row">
-                                        <div>
-                                            <h2 className="text-xl font-bold">
-                                                Student
-                                            </h2>
+                                    {request.status === "ACCEPTED" && <CheckCircle2 className="h-3 w-3" />}
+                                    {request.status === "PENDING" && <Clock className="h-3 w-3" />}
+                                    {request.status === "REJECTED" && <XCircle className="h-3 w-3" />}
+                                    {request.status}
+                                </span>
+                            </div>
 
-                                            <p className="mt-1 text-sm text-gray-500">
-                                                {
-                                                    request
-                                                        .student
-                                                        .user
-                                                        .email
-                                                }
-                                            </p>
-                                        </div>
+                            <div className="grid grid-cols-2 md:grid-cols-3 gap-4 text-xs bg-slate-50 p-4 rounded-xl border border-slate-100">
+                                <div>
+                                    <span className="text-[10px] uppercase font-semibold text-slate-400 block">Grade Level</span>
+                                    <span className="font-bold text-slate-900">{request.student.grade}</span>
+                                </div>
+                                <div>
+                                    <span className="text-[10px] uppercase font-semibold text-slate-400 block">School</span>
+                                    <span className="font-bold text-slate-900">{request.student.schoolName || "Not specified"}</span>
+                                </div>
+                                <div className="col-span-2 md:col-span-1">
+                                    <span className="text-[10px] uppercase font-semibold text-slate-400 block">Requested Date</span>
+                                    <span className="font-bold text-slate-900">{new Date(request.createdAt).toLocaleDateString()}</span>
+                                </div>
+                            </div>
 
-                                        <span
-                                            className={`h-fit rounded-full px-3 py-1 text-sm font-medium ${request.status ===
-                                                    "PENDING"
-                                                    ? "bg-yellow-100 text-yellow-800"
-                                                    : request.status ===
-                                                        "ACCEPTED"
-                                                        ? "bg-green-100 text-green-800"
-                                                        : "bg-red-100 text-red-800"
-                                                }`}
-                                        >
-                                            {
-                                                request.status
-                                            }
-                                        </span>
-                                    </div>
-
-                                    <div className="mt-6 grid gap-4 md:grid-cols-2">
-                                        <div>
-                                            <p className="text-sm font-semibold">
-                                                Grade
-                                            </p>
-
-                                            <p className="text-gray-600">
-                                                {
-                                                    request
-                                                        .student
-                                                        .grade
-                                                }
-                                            </p>
-                                        </div>
-
-                                        <div>
-                                            <p className="text-sm font-semibold">
-                                                School
-                                            </p>
-
-                                            <p className="text-gray-600">
-                                                {request
-                                                    .student
-                                                    .schoolName ||
-                                                    "Not provided"}
-                                            </p>
-                                        </div>
-                                    </div>
-
-                                    {request
-                                        .student
-                                        .learningNeeds && (
-                                            <div className="mt-6">
-                                                <p className="text-sm font-semibold">
-                                                    Learning Needs
-                                                </p>
-
-                                                <p className="mt-1 text-gray-600">
-                                                    {
-                                                        request
-                                                            .student
-                                                            .learningNeeds
-                                                    }
-                                                </p>
-                                            </div>
-                                        )}
-
-                                    {request.message && (
-                                        <div className="mt-6 rounded-lg bg-gray-50 p-4">
-                                            <p className="text-sm font-semibold">
-                                                Student Message
-                                            </p>
-
-                                            <p className="mt-1 text-gray-600">
-                                                {
-                                                    request.message
-                                                }
-                                            </p>
-                                        </div>
-                                    )}
-
-                                    <div className="mt-6">
-                                        <p className="text-sm font-semibold">
-                                            Subjects
-                                        </p>
-
-                                        <div className="mt-2 flex flex-wrap gap-2">
-                                            {request.student.subjects.map(
-                                                (
-                                                    subject
-                                                ) => (
-                                                    <span
-                                                        key={
-                                                            subject.id
-                                                        }
-                                                        className="rounded-full border px-3 py-1 text-sm"
-                                                    >
-                                                        {
-                                                            subject
-                                                                .subject
-                                                                .name
-                                                        }
-
-                                                        {subject.currentLevel
-                                                            ? ` (${subject.currentLevel})`
-                                                            : ""}
-                                                    </span>
-                                                )
-                                            )}
-                                        </div>
-                                    </div>
-
-                                    {request.status ===
-                                        "PENDING" && (
-                                            <div className="mt-6 flex gap-3">
-                                                <button
-                                                    type="button"
-                                                    onClick={() =>
-                                                        updateRequest(
-                                                            request.id,
-                                                            "ACCEPTED"
-                                                        )
-                                                    }
-                                                    className="rounded-lg bg-green-600 px-5 py-3 font-medium text-white hover:bg-green-700"
-                                                >
-                                                    Accept Request
-                                                </button>
-
-                                                <button
-                                                    type="button"
-                                                    onClick={() =>
-                                                        updateRequest(
-                                                            request.id,
-                                                            "REJECTED"
-                                                        )
-                                                    }
-                                                    className="rounded-lg border border-red-300 px-5 py-3 font-medium text-red-600 hover:bg-red-50"
-                                                >
-                                                    Reject Request
-                                                </button>
-                                            </div>
-                                        )}
-
-                                    <p className="mt-4 text-xs text-gray-400">
-                                        Requested{" "}
-                                        {new Date(
-                                            request.createdAt
-                                        ).toLocaleString()}
+                            {request.student.learningNeeds && (
+                                <div className="text-xs space-y-1">
+                                    <span className="text-[10px] uppercase font-semibold text-slate-400 block">Learning Needs</span>
+                                    <p className="text-slate-700 bg-indigo-50/50 p-3 rounded-xl border border-indigo-100 italic">
+                                        "{request.student.learningNeeds}"
                                     </p>
                                 </div>
-                            )
-                        )}
-                    </div>
-                )}
-            </div>
+                            )}
+
+                            {request.message && (
+                                <div className="text-xs space-y-1">
+                                    <span className="text-[10px] uppercase font-semibold text-slate-400 block">Personal Note</span>
+                                    <p className="text-slate-700 bg-emerald-50/50 p-3 rounded-xl border border-emerald-100 italic">
+                                        "{request.message}"
+                                    </p>
+                                </div>
+                            )}
+
+                            {request.student.subjects?.length > 0 && (
+                                <div className="space-y-1 text-xs">
+                                    <span className="text-[10px] uppercase font-semibold text-slate-400 block">Requested Subjects</span>
+                                    <div className="flex flex-wrap gap-1.5">
+                                        {request.student.subjects.map((sub) => (
+                                            <span
+                                                key={sub.id}
+                                                className="rounded-lg bg-slate-100 border border-slate-200 px-2.5 py-1 font-semibold text-slate-700"
+                                            >
+                                                {sub.subject.name} {sub.currentLevel ? `(${sub.currentLevel})` : ""}
+                                            </span>
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
+
+                            {request.status === "PENDING" && (
+                                <div className="pt-3 border-t border-slate-100 flex items-center justify-end gap-3">
+                                    <button
+                                        type="button"
+                                        onClick={() => updateRequest(request.id, "REJECTED")}
+                                        className="rounded-xl border border-rose-200 text-rose-600 hover:bg-rose-50 px-4 py-2 text-xs font-bold transition"
+                                    >
+                                        Decline Request
+                                    </button>
+                                    <button
+                                        type="button"
+                                        onClick={() => updateRequest(request.id, "ACCEPTED")}
+                                        className="rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white px-5 py-2 text-xs font-bold transition shadow-xs"
+                                    >
+                                        Accept Match Request
+                                    </button>
+                                </div>
+                            )}
+                        </div>
+                    ))}
+                </div>
+            )}
         </main>
     );
 }
