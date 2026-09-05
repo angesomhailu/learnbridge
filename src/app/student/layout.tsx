@@ -14,6 +14,10 @@ import {
     Settings,
     LogOut,
     X,
+    BookOpen,
+    DollarSign,
+    Clock,
+    Target,
 } from "lucide-react";
 
 interface StudentLayoutProps {
@@ -50,6 +54,26 @@ const menuItems = [
         name: "My Progress",
         href: "/student/progress",
         icon: TrendingUp,
+    },
+    {
+        name: "Subjects",
+        href: "/student/subjects",
+        icon: BookOpen,
+    },
+    {
+        name: "Budget",
+        href: "/student/budget",
+        icon: DollarSign,
+    },
+    {
+        name: "Availability",
+        href: "/student/availability",
+        icon: Clock,
+    },
+    {
+        name: "Learning Goals",
+        href: "/student/goals",
+        icon: Target,
     },
     {
         name: "Payments",
@@ -118,8 +142,8 @@ export default function StudentLayout({
                                     key={item.href}
                                     href={item.href}
                                     className={`flex items-center gap-3 rounded-xl px-3 py-3 text-sm font-medium transition ${active
-                                            ? "bg-blue-50 text-blue-600"
-                                            : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
+                                        ? "bg-blue-50 text-blue-600"
+                                        : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
                                         }`}
                                 >
                                     <Icon className="h-5 w-5" />
@@ -144,8 +168,8 @@ export default function StudentLayout({
                                     key={item.href}
                                     href={item.href}
                                     className={`flex items-center gap-3 rounded-xl px-3 py-3 text-sm font-medium transition ${active
-                                            ? "bg-blue-50 text-blue-600"
-                                            : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
+                                        ? "bg-blue-50 text-blue-600"
+                                        : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
                                         }`}
                                 >
                                     <Icon className="h-5 w-5" />
