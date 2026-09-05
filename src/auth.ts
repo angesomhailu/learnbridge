@@ -6,7 +6,8 @@ import { z } from "zod";
 import { prisma } from "@/lib/prisma";
 
 const loginSchema = z.object({
-    email: z.string().email(),
+    identifier: z.string().min(1).optional(),
+    email: z.string().optional(),
     password: z.string().min(8),
 });
 
@@ -16,6 +17,10 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
             name: "Credentials",
 
             credentials: {
+                identifier: {
+                    label: "Email or Phone",
+                    type: "text",
+                },
                 email: {
                     label: "Email",
                     type: "email",
@@ -33,11 +38,16 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
                     return null;
                 }
 
-                const { email, password } = result.data;
+                const { identifier, email, password } = result.data;
+                const loginInput = (email || identifier || "").toLowerCase().trim();
+
+                if (!loginInput) {
+                    return null;
+                }
 
                 const user = await prisma.user.findUnique({
                     where: {
-                        email: email.toLowerCase().trim(),
+                        email: loginInput,
                     },
                 });
 
@@ -45,7 +55,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
                     return null;
                 }
 
-                if (user.status !== "ACTIVE") {
+                if (user.status === "SUSPENDED" || user.status === "DEACTIVATED") {
                     return null;
                 }
 

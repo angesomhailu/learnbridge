@@ -21,8 +21,11 @@ export default function LoginPage() {
         setError("");
         setLoading(true);
 
+        const cleanInput = identifier.trim().toLowerCase();
+
         const result = await signIn("credentials", {
-            identifier,
+            identifier: cleanInput,
+            email: cleanInput,
             password,
             redirect: false,
         });

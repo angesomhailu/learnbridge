@@ -66,7 +66,7 @@ export default function TutorBookingsPage() {
             }
         } catch (error) {
             console.error(error);
-        } font - bold {
+        } finally {
             setUpdating(null);
         }
     }
@@ -97,8 +97,8 @@ export default function TutorBookingsPage() {
                             key={tab}
                             onClick={() => setStatusFilter(tab)}
                             className={`px-3.5 py-1.5 rounded-lg text-xs font-bold transition ${statusFilter === tab
-                                    ? "bg-emerald-600 text-white shadow-xs"
-                                    : "text-slate-500 hover:text-slate-900"
+                                ? "bg-emerald-600 text-white shadow-xs"
+                                : "text-slate-500 hover:text-slate-900"
                                 }`}
                         >
                             {tab}
@@ -145,10 +145,10 @@ export default function TutorBookingsPage() {
 
                                     <span
                                         className={`inline-flex items-center gap-1 px-3 py-1 rounded-full text-[10px] font-bold ${b.status === "CONFIRMED"
-                                                ? "bg-emerald-100 text-emerald-800"
-                                                : b.status === "PENDING"
-                                                    ? "bg-amber-100 text-amber-800"
-                                                    : "bg-rose-100 text-rose-800"
+                                            ? "bg-emerald-100 text-emerald-800"
+                                            : b.status === "PENDING"
+                                                ? "bg-amber-100 text-amber-800"
+                                                : "bg-rose-100 text-rose-800"
                                             }`}
                                     >
                                         {b.status}

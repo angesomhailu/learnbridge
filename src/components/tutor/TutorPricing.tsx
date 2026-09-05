@@ -28,7 +28,7 @@ export default function TutorPricing() {
             }
         } catch (error) {
             console.error(error);
-        } font - bold {
+        } finally {
             setLoading(false);
         }
     }

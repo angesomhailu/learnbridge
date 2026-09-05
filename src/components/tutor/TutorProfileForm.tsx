@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { User, Calendar, Award, Languages, BookOpen, CheckCircle2, Save } from "lucide-react";
 
 export default function TutorProfileForm() {
     const [dateOfBirth, setDateOfBirth] = useState("");
@@ -8,7 +9,6 @@ export default function TutorProfileForm() {
     const [bio, setBio] = useState("");
     const [experienceYears, setExperienceYears] = useState("");
     const [languages, setLanguages] = useState("");
-
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
     const [message, setMessage] = useState("");
@@ -19,41 +19,26 @@ export default function TutorProfileForm() {
                 const response = await fetch("/api/tutor/profile");
                 const data = await response.json();
 
-                if (!response.ok) {
-                    setMessage(data.message || "Failed to load profile.");
-                    return;
-                }
-
-                if (data.profile) {
+                if (response.ok && data.profile) {
                     const profile = data.profile;
-
                     setDateOfBirth(
                         profile.dateOfBirth
-                            ? new Date(profile.dateOfBirth)
-                                .toISOString()
-                                .split("T")[0]
+                            ? new Date(profile.dateOfBirth).toISOString().split("T")[0]
                             : ""
                     );
-
                     setGender(profile.gender || "PREFER_NOT_TO_SAY");
                     setBio(profile.bio || "");
-
                     setExperienceYears(
-                        profile.experienceYears !== null &&
-                            profile.experienceYears !== undefined
+                        profile.experienceYears !== null && profile.experienceYears !== undefined
                             ? String(profile.experienceYears)
                             : ""
                     );
-
                     setLanguages(
-                        Array.isArray(profile.languages)
-                            ? profile.languages.join(", ")
-                            : ""
+                        Array.isArray(profile.languages) ? profile.languages.join(", ") : ""
                     );
                 }
             } catch (error) {
                 console.error(error);
-                setMessage("Failed to load tutor profile.");
             } finally {
                 setLoading(false);
             }
@@ -69,9 +54,7 @@ export default function TutorProfileForm() {
         try {
             const response = await fetch("/api/tutor/profile", {
                 method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
+                headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
                     dateOfBirth,
                     gender,
@@ -86,125 +69,122 @@ export default function TutorProfileForm() {
 
             const data = await response.json();
 
-            if (!response.ok) {
+            if (response.ok) {
+                setMessage("Tutor profile updated successfully!");
+                setTimeout(() => setMessage(""), 3000);
+            } else {
                 setMessage(data.message || "Failed to save profile.");
-                return;
             }
-
-            setMessage("Tutor profile saved successfully.");
         } catch (error) {
             console.error(error);
-            setMessage("Something went wrong.");
         } finally {
             setSaving(false);
         }
     }
 
     if (loading) {
-        return <p>Loading tutor profile...</p>;
+        return (
+            <div className="flex justify-center py-12">
+                <div className="h-7 w-7 animate-spin rounded-full border-4 border-emerald-600 border-t-transparent"></div>
+            </div>
+        );
     }
 
     return (
         <div className="space-y-6">
             {message && (
-                <div className="rounded-lg border p-4">
+                <div className="rounded-xl border border-emerald-200 bg-emerald-50 p-4 text-xs font-semibold text-emerald-800 flex items-center gap-2">
+                    <CheckCircle2 className="h-4 w-4 text-emerald-600" />
                     {message}
                 </div>
             )}
 
-            <div>
-                <label className="mb-2 block font-medium">
-                    Date of Birth
-                </label>
+            <div className="grid gap-4 sm:grid-cols-2">
+                <div className="space-y-1">
+                    <label className="text-xs font-semibold text-slate-700 flex items-center gap-1.5">
+                        <Calendar className="h-3.5 w-3.5 text-slate-400" />
+                        Date of Birth
+                    </label>
+                    <input
+                        type="date"
+                        value={dateOfBirth}
+                        onChange={(e) => setDateOfBirth(e.target.value)}
+                        className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs text-slate-900 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                    />
+                </div>
 
-                <input
-                    type="date"
-                    value={dateOfBirth}
-                    onChange={(e) => setDateOfBirth(e.target.value)}
-                    className="w-full rounded-lg border p-3"
-                />
+                <div className="space-y-1">
+                    <label className="text-xs font-semibold text-slate-700 flex items-center gap-1.5">
+                        <User className="h-3.5 w-3.5 text-slate-400" />
+                        Gender
+                    </label>
+                    <select
+                        value={gender}
+                        onChange={(e) => setGender(e.target.value)}
+                        className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs text-slate-900 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                    >
+                        <option value="MALE">Male</option>
+                        <option value="FEMALE">Female</option>
+                        <option value="OTHER">Other</option>
+                        <option value="PREFER_NOT_TO_SAY">Prefer not to say</option>
+                    </select>
+                </div>
+
+                <div className="space-y-1">
+                    <label className="text-xs font-semibold text-slate-700 flex items-center gap-1.5">
+                        <Award className="h-3.5 w-3.5 text-slate-400" />
+                        Teaching Experience (Years)
+                    </label>
+                    <input
+                        type="number"
+                        min="0"
+                        value={experienceYears}
+                        onChange={(e) => setExperienceYears(e.target.value)}
+                        placeholder="e.g. 5"
+                        className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs text-slate-900 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                    />
+                </div>
+
+                <div className="space-y-1">
+                    <label className="text-xs font-semibold text-slate-700 flex items-center gap-1.5">
+                        <Languages className="h-3.5 w-3.5 text-slate-400" />
+                        Spoken Languages
+                    </label>
+                    <input
+                        type="text"
+                        value={languages}
+                        onChange={(e) => setLanguages(e.target.value)}
+                        placeholder="e.g. English, Amharic, Tigrinya"
+                        className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs text-slate-900 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                    />
+                </div>
             </div>
 
-            <div>
-                <label className="mb-2 block font-medium">
-                    Gender
+            <div className="space-y-1">
+                <label className="text-xs font-semibold text-slate-700 flex items-center gap-1.5">
+                    <BookOpen className="h-3.5 w-3.5 text-slate-400" />
+                    Teaching Philosophy & Biography
                 </label>
-
-                <select
-                    value={gender}
-                    onChange={(e) => setGender(e.target.value)}
-                    className="w-full rounded-lg border p-3"
-                >
-                    <option value="MALE">Male</option>
-                    <option value="FEMALE">Female</option>
-                    <option value="OTHER">Other</option>
-                    <option value="PREFER_NOT_TO_SAY">
-                        Prefer not to say
-                    </option>
-                </select>
-            </div>
-
-            <div>
-                <label className="mb-2 block font-medium">
-                    Teaching Experience
-                </label>
-
-                <input
-                    type="number"
-                    min="0"
-                    value={experienceYears}
-                    onChange={(e) =>
-                        setExperienceYears(e.target.value)
-                    }
-                    placeholder="Example: 3"
-                    className="w-full rounded-lg border p-3"
-                />
-
-                <p className="mt-1 text-sm text-gray-500">
-                    Number of years you have been teaching.
-                </p>
-            </div>
-
-            <div>
-                <label className="mb-2 block font-medium">
-                    Languages
-                </label>
-
-                <input
-                    type="text"
-                    value={languages}
-                    onChange={(e) => setLanguages(e.target.value)}
-                    placeholder="Example: English, Amharic, Tigrinya"
-                    className="w-full rounded-lg border p-3"
-                />
-
-                <p className="mt-1 text-sm text-gray-500">
-                    Separate multiple languages with commas.
-                </p>
-            </div>
-
-            <div>
-                <label className="mb-2 block font-medium">
-                    About You
-                </label>
-
                 <textarea
                     value={bio}
                     onChange={(e) => setBio(e.target.value)}
-                    rows={6}
-                    placeholder="Tell students about your teaching experience and approach..."
-                    className="w-full rounded-lg border p-3"
+                    rows={5}
+                    placeholder="Describe your academic methodology, tutoring background, and how you help students succeed..."
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl p-3.5 text-xs text-slate-900 focus:outline-none focus:ring-2 focus:ring-emerald-500 leading-relaxed"
                 />
             </div>
 
-            <button
-                type="button"
-                onClick={saveProfile}
-                disabled={saving}
-                className="rounded-lg bg-black px-6 py-3 font-medium text-white disabled:opacity-50"
-            >
-                {saving ? "Saving..." : "Save Tutor Profile"}
-            </button>
+            <div className="flex justify-end pt-2">
+                <button
+                    type="button"
+                    onClick={saveProfile}
+                    disabled={saving}
+                    className="inline-flex items-center gap-2 rounded-xl bg-emerald-600 px-6 py-2.5 text-xs font-bold text-white hover:bg-emerald-700 disabled:opacity-50 transition shadow-xs"
+                >
+                    <Save className="h-4 w-4" />
+                    {saving ? "Saving..." : "Save Tutor Profile"}
+                </button>
+            </div>
         </div>
     );
 }
