@@ -3,6 +3,7 @@ import bcrypt from "bcryptjs";
 import { z } from "zod";
 
 import { prisma } from "@/lib/prisma";
+import { sendAccountCreationNotifications } from "@/lib/services/notificationService";
 
 const registerSchema = z.object({
     email: z
@@ -127,6 +128,15 @@ export async function POST(request: Request) {
             }
 
             return newUser;
+        });
+
+        // Trigger SMS & Email welcome notifications asynchronously
+        sendAccountCreationNotifications({
+            email: user.email,
+            phone: user.phone || undefined,
+            role: user.role,
+        }).catch((err) => {
+            console.error("Account creation notification background error:", err);
         });
 
         return NextResponse.json(
