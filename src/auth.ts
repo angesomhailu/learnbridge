@@ -11,6 +11,35 @@ const loginSchema = z.object({
     password: z.string().min(8),
 });
 
+function getPhoneVariants(input: string): string[] {
+    const clean = input.trim();
+    const digitsOnly = clean.replace(/\D/g, "");
+
+    const variants = new Set<string>([clean, digitsOnly]);
+
+    // Handle Ethiopian phone numbers (9 digits starting with 9)
+    if (digitsOnly.length === 9 && digitsOnly.startsWith("9")) {
+        variants.add(digitsOnly);
+        variants.add(`0${digitsOnly}`);
+        variants.add(`+251${digitsOnly}`);
+        variants.add(`251${digitsOnly}`);
+    } else if (digitsOnly.length === 10 && digitsOnly.startsWith("09")) {
+        const nineDigits = digitsOnly.slice(1);
+        variants.add(nineDigits);
+        variants.add(digitsOnly);
+        variants.add(`+251${nineDigits}`);
+        variants.add(`251${nineDigits}`);
+    } else if (digitsOnly.length === 12 && digitsOnly.startsWith("2519")) {
+        const nineDigits = digitsOnly.slice(3);
+        variants.add(nineDigits);
+        variants.add(`0${nineDigits}`);
+        variants.add(`+251${nineDigits}`);
+        variants.add(digitsOnly);
+    }
+
+    return Array.from(variants).filter(Boolean);
+}
+
 export const { handlers, auth, signIn, signOut } = NextAuth({
     providers: [
         Credentials({
@@ -45,9 +74,17 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
                     return null;
                 }
 
-                const user = await prisma.user.findUnique({
+                const phoneVariants = getPhoneVariants(loginInput);
+
+                const user = await prisma.user.findFirst({
                     where: {
-                        email: loginInput,
+                        OR: [
+                            { email: loginInput },
+                            { phone: { in: phoneVariants } },
+                            { student: { phone: { in: phoneVariants } } },
+                            { parent: { phone: { in: phoneVariants } } },
+                            { tutor: { phone: { in: phoneVariants } } },
+                        ],
                     },
                 });
 

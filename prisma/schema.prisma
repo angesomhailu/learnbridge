@@ -99,6 +99,7 @@ enum ReportStatus {
 model User {
   id           String     @id @default(cuid())
   email        String     @unique
+  phone        String?    @unique
   passwordHash String
   role         UserRole
   status       UserStatus @default(PENDING)
@@ -126,7 +127,7 @@ model User {
 model StudentProfile {
   id     String @id @default(cuid())
   userId String @unique
-phone String?
+  phone  String?
   dateOfBirth DateTime
   gender      Gender
   grade       String
@@ -165,11 +166,10 @@ phone String?
 model ParentProfile {
   id     String @id @default(cuid())
   userId String @unique
-  phone String?
+  phone  String?
 
   dateOfBirth DateTime?
   gender      Gender?
-  phone       String?
 
   occupation String?
   address    String?

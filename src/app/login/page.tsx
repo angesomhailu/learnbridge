@@ -21,11 +21,22 @@ export default function LoginPage() {
         setError("");
         setLoading(true);
 
-        const cleanInput = identifier.trim().toLowerCase();
+        let cleanInput = identifier.trim();
+
+        // Normalize phone number
+        if (/^09\d{8}$/.test(cleanInput)) {
+            cleanInput = `+251${cleanInput.substring(1)}`;
+        } else if (/^9\d{8}$/.test(cleanInput)) {
+            cleanInput = `+251${cleanInput}`;
+        }
+
+        // Normalize email only
+        if (cleanInput.includes("@")) {
+            cleanInput = cleanInput.toLowerCase();
+        }
 
         const result = await signIn("credentials", {
             identifier: cleanInput,
-            email: cleanInput,
             password,
             redirect: false,
         });

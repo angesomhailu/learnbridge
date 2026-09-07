@@ -15,6 +15,10 @@ const registerSchema = z.object({
         .min(8, "Password must be at least 8 characters"),
 
     role: z.enum(["STUDENT", "PARENT", "TUTOR"]),
+
+    phone: z.string().optional(),
+
+    dateOfBirth: z.string().optional(),
 });
 
 export async function POST(request: Request) {
@@ -46,17 +50,28 @@ export async function POST(request: Request) {
             );
         }
 
-        const { email, password, role } = result.data;
+        const { email, password, role, phone, dateOfBirth } = result.data;
 
-        const existingUser = await prisma.user.findUnique({
-            where: { email },
+        const cleanPhone = phone ? phone.trim() : undefined;
+
+        // Check if email or phone is already registered
+        const existingUser = await prisma.user.findFirst({
+            where: {
+                OR: [
+                    { email },
+                    ...(cleanPhone ? [{ phone: cleanPhone }] : []),
+                ],
+            },
         });
 
         if (existingUser) {
+            const isEmailMatch = existingUser.email === email;
             return NextResponse.json(
                 {
                     success: false,
-                    message: "An account with this email already exists",
+                    message: isEmailMatch
+                        ? "An account with this email already exists"
+                        : "An account with this phone number already exists",
                 },
                 { status: 409 }
             );
@@ -68,17 +83,21 @@ export async function POST(request: Request) {
             const newUser = await tx.user.create({
                 data: {
                     email,
+                    phone: cleanPhone,
                     passwordHash,
                     role,
                     status: role === "TUTOR" ? "PENDING" : "ACTIVE",
                 },
             });
 
+            const parsedDob = dateOfBirth ? new Date(dateOfBirth) : new Date("2000-01-01");
+
             if (role === "STUDENT") {
                 await tx.studentProfile.create({
                     data: {
                         userId: newUser.id,
-                        dateOfBirth: new Date("2000-01-01"),
+                        phone: cleanPhone,
+                        dateOfBirth: parsedDob,
                         gender: "PREFER_NOT_TO_SAY",
                         grade: "Not specified",
                         languages: [],
@@ -90,6 +109,7 @@ export async function POST(request: Request) {
                 await tx.parentProfile.create({
                     data: {
                         userId: newUser.id,
+                        phone: cleanPhone,
                     },
                 });
             }
@@ -98,7 +118,8 @@ export async function POST(request: Request) {
                 await tx.tutorProfile.create({
                     data: {
                         userId: newUser.id,
-                        dateOfBirth: new Date("2000-01-01"),
+                        phone: cleanPhone,
+                        dateOfBirth: parsedDob,
                         gender: "PREFER_NOT_TO_SAY",
                         languages: [],
                     },
@@ -115,6 +136,7 @@ export async function POST(request: Request) {
                 user: {
                     id: user.id,
                     email: user.email,
+                    phone: user.phone,
                     role: user.role,
                     status: user.status,
                     createdAt: user.createdAt,
