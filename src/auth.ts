@@ -2,7 +2,7 @@ import NextAuth from "next-auth";
 import Credentials from "next-auth/providers/credentials";
 import bcrypt from "bcryptjs";
 import { z } from "zod";
-
+import Google from "next-auth/providers/google";
 import { prisma } from "@/lib/prisma";
 
 const loginSchema = z.object({
@@ -42,6 +42,10 @@ function getPhoneVariants(input: string): string[] {
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
     providers: [
+        Google({
+            clientId: process.env.AUTH_GOOGLE_ID!,
+            clientSecret: process.env.AUTH_GOOGLE_SECRET!,
+        }),
         Credentials({
             name: "Credentials",
 
