@@ -51,22 +51,34 @@ export async function POST(request: Request) {
             );
         }
 
-        const { email, password, role, phone, dateOfBirth } = result.data;
+        const {
+            email,
+            password,
+            role,
+            phone,
+            dateOfBirth,
+        } = result.data;
 
-        const cleanPhone = phone ? phone.trim() : undefined;
+        const cleanPhone = phone
+            ? phone.trim()
+            : undefined;
 
         // Check if email or phone is already registered
         const existingUser = await prisma.user.findFirst({
             where: {
                 OR: [
                     { email },
-                    ...(cleanPhone ? [{ phone: cleanPhone }] : []),
+                    ...(cleanPhone
+                        ? [{ phone: cleanPhone }]
+                        : []),
                 ],
             },
         });
 
         if (existingUser) {
-            const isEmailMatch = existingUser.email === email;
+            const isEmailMatch =
+                existingUser.email === email;
+
             return NextResponse.json(
                 {
                     success: false,
@@ -78,65 +90,84 @@ export async function POST(request: Request) {
             );
         }
 
-        const passwordHash = await bcrypt.hash(password, 12);
+        const passwordHash = await bcrypt.hash(
+            password,
+            12
+        );
 
-        const user = await prisma.$transaction(async (tx) => {
-            const newUser = await tx.user.create({
-                data: {
-                    email,
-                    phone: cleanPhone,
-                    passwordHash,
-                    role,
-                    status: role === "TUTOR" ? "PENDING" : "ACTIVE",
-                },
-            });
-
-            const parsedDob = dateOfBirth ? new Date(dateOfBirth) : new Date("2000-01-01");
-
-            if (role === "STUDENT") {
-                await tx.studentProfile.create({
+        const user = await prisma.$transaction(
+            async (tx) => {
+                const newUser = await tx.user.create({
                     data: {
-                        userId: newUser.id,
+                        email,
                         phone: cleanPhone,
-                        dateOfBirth: parsedDob,
-                        gender: "PREFER_NOT_TO_SAY",
-                        grade: "Not specified",
-                        languages: [],
+                        passwordHash,
+                        role,
+                        status:
+                            role === "TUTOR"
+                                ? "PENDING"
+                                : "ACTIVE",
                     },
                 });
+
+                const parsedDob = dateOfBirth
+                    ? new Date(dateOfBirth)
+                    : new Date("2000-01-01");
+
+                if (role === "STUDENT") {
+                    await tx.studentProfile.create({
+                        data: {
+                            userId: newUser.id,
+                            phone: cleanPhone,
+                            dateOfBirth: parsedDob,
+                            gender: "PREFER_NOT_TO_SAY",
+                            grade: "Not specified",
+                            languages: [],
+                        },
+                    });
+                }
+
+                if (role === "PARENT") {
+                    await tx.parentProfile.create({
+                        data: {
+                            userId: newUser.id,
+                            phone: cleanPhone,
+                        },
+                    });
+                }
+
+                if (role === "TUTOR") {
+                    await tx.tutorProfile.create({
+                        data: {
+                            userId: newUser.id,
+                            phone: cleanPhone,
+                            dateOfBirth: parsedDob,
+                            gender: "PREFER_NOT_TO_SAY",
+                            languages: [],
+                        },
+                    });
+                }
+
+                return newUser;
             }
+        );
 
-            if (role === "PARENT") {
-                await tx.parentProfile.create({
-                    data: {
-                        userId: newUser.id,
-                        phone: cleanPhone,
-                    },
-                });
-            }
-
-            if (role === "TUTOR") {
-                await tx.tutorProfile.create({
-                    data: {
-                        userId: newUser.id,
-                        phone: cleanPhone,
-                        dateOfBirth: parsedDob,
-                        gender: "PREFER_NOT_TO_SAY",
-                        languages: [],
-                    },
-                });
-            }
-
-            return newUser;
-        });
-
-        // Trigger SMS & Email welcome notifications asynchronously
+        /*
+         * Normal registration already has a validated
+         * email and role, so use those values here.
+         *
+         * This also avoids the new nullable Prisma
+         * User.email / User.role types.
+         */
         sendAccountCreationNotifications({
-            email: user.email,
+            email,
             phone: user.phone || undefined,
-            role: user.role,
+            role,
         }).catch((err) => {
-            console.error("Account creation notification background error:", err);
+            console.error(
+                "Account creation notification background error:",
+                err
+            );
         });
 
         return NextResponse.json(

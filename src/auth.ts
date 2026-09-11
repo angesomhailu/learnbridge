@@ -1,8 +1,9 @@
 import NextAuth from "next-auth";
 import Credentials from "next-auth/providers/credentials";
+import Google from "next-auth/providers/google";
 import bcrypt from "bcryptjs";
 import { z } from "zod";
-import Google from "next-auth/providers/google";
+
 import { prisma } from "@/lib/prisma";
 
 const loginSchema = z.object({
@@ -17,7 +18,6 @@ function getPhoneVariants(input: string): string[] {
 
     const variants = new Set<string>([clean, digitsOnly]);
 
-    // Handle Ethiopian phone numbers (9 digits starting with 9)
     if (digitsOnly.length === 9 && digitsOnly.startsWith("9")) {
         variants.add(digitsOnly);
         variants.add(`0${digitsOnly}`);
@@ -25,12 +25,17 @@ function getPhoneVariants(input: string): string[] {
         variants.add(`251${digitsOnly}`);
     } else if (digitsOnly.length === 10 && digitsOnly.startsWith("09")) {
         const nineDigits = digitsOnly.slice(1);
+
         variants.add(nineDigits);
         variants.add(digitsOnly);
         variants.add(`+251${nineDigits}`);
         variants.add(`251${nineDigits}`);
-    } else if (digitsOnly.length === 12 && digitsOnly.startsWith("2519")) {
+    } else if (
+        digitsOnly.length === 12 &&
+        digitsOnly.startsWith("2519")
+    ) {
         const nineDigits = digitsOnly.slice(3);
+
         variants.add(nineDigits);
         variants.add(`0${nineDigits}`);
         variants.add(`+251${nineDigits}`);
@@ -46,6 +51,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
             clientId: process.env.AUTH_GOOGLE_ID!,
             clientSecret: process.env.AUTH_GOOGLE_SECRET!,
         }),
+
         Credentials({
             name: "Credentials",
 
@@ -54,10 +60,12 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
                     label: "Email or Phone",
                     type: "text",
                 },
+
                 email: {
                     label: "Email",
                     type: "email",
                 },
+
                 password: {
                     label: "Password",
                     type: "password",
@@ -71,23 +79,59 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
                     return null;
                 }
 
-                const { identifier, email, password } = result.data;
-                const loginInput = (email || identifier || "").toLowerCase().trim();
+                const {
+                    identifier,
+                    email,
+                    password,
+                } = result.data;
+
+                const loginInput = (
+                    email ||
+                    identifier ||
+                    ""
+                )
+                    .toLowerCase()
+                    .trim();
 
                 if (!loginInput) {
                     return null;
                 }
 
-                const phoneVariants = getPhoneVariants(loginInput);
+                const phoneVariants =
+                    getPhoneVariants(loginInput);
 
                 const user = await prisma.user.findFirst({
                     where: {
                         OR: [
-                            { email: loginInput },
-                            { phone: { in: phoneVariants } },
-                            { student: { phone: { in: phoneVariants } } },
-                            { parent: { phone: { in: phoneVariants } } },
-                            { tutor: { phone: { in: phoneVariants } } },
+                            {
+                                email: loginInput,
+                            },
+                            {
+                                phone: {
+                                    in: phoneVariants,
+                                },
+                            },
+                            {
+                                student: {
+                                    phone: {
+                                        in: phoneVariants,
+                                    },
+                                },
+                            },
+                            {
+                                parent: {
+                                    phone: {
+                                        in: phoneVariants,
+                                    },
+                                },
+                            },
+                            {
+                                tutor: {
+                                    phone: {
+                                        in: phoneVariants,
+                                    },
+                                },
+                            },
                         ],
                     },
                 });
@@ -96,22 +140,41 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
                     return null;
                 }
 
-                if (user.status === "SUSPENDED" || user.status === "DEACTIVATED") {
+                if (
+                    user.status === "SUSPENDED" ||
+                    user.status === "DEACTIVATED"
+                ) {
                     return null;
                 }
 
-                const passwordMatches = await bcrypt.compare(
-                    password,
-                    user.passwordHash
-                );
+                if (!user.passwordHash) {
+                    return null;
+                }
+
+                const passwordMatches =
+                    await bcrypt.compare(
+                        password,
+                        user.passwordHash
+                    );
 
                 if (!passwordMatches) {
                     return null;
                 }
 
+                /*
+                 * Normal credential accounts should always
+                 * have a role.
+                 *
+                 * A role-null account belongs to the social
+                 * authentication completion flow.
+                 */
+                if (!user.role) {
+                    return null;
+                }
+
                 return {
                     id: user.id,
-                    email: user.email,
+                    email: user.email ?? undefined,
                     role: user.role,
                 };
             },
@@ -123,10 +186,103 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     },
 
     callbacks: {
+        async signIn({ user, account }) {
+            /*
+             * GOOGLE LOGIN
+             */
+            if (account?.provider === "google") {
+                if (!user.email) {
+                    return false;
+                }
+
+                const email =
+                    user.email.toLowerCase().trim();
+
+                const existingUser =
+                    await prisma.user.findUnique({
+                        where: {
+                            email,
+                        },
+                    });
+
+                /*
+                 * Existing LearnBridge account
+                 */
+                if (existingUser) {
+                    if (
+                        existingUser.status === "SUSPENDED" ||
+                        existingUser.status === "DEACTIVATED"
+                    ) {
+                        return false;
+                    }
+
+                    user.id = existingUser.id;
+                    user.email =
+                        existingUser.email ?? undefined;
+
+                    /*
+                     * IMPORTANT:
+                     * Only assign a role when one exists.
+                     *
+                     * If role is null, the user is sent to
+                     * /social-complete after authentication.
+                     */
+                    if (existingUser.role !== null) {
+                        user.role = existingUser.role;
+                    }
+
+                    return true;
+                }
+
+                /*
+                 * New Google account
+                 */
+                const newUser =
+                    await prisma.user.create({
+                        data: {
+                            email,
+                            passwordHash: null,
+                            role: null,
+                            status: "PENDING",
+                        },
+                    });
+
+                user.id = newUser.id;
+                user.email =
+                    newUser.email ?? undefined;
+
+                /*
+                 * Do NOT do:
+                 *
+                 * user.role = null
+                 *
+                 * because the NextAuth User type currently
+                 * expects a concrete role.
+                 *
+                 * The JWT callback below will explicitly
+                 * preserve the absence of a role as null.
+                 */
+
+                return true;
+            }
+
+            return true;
+        },
+
         async jwt({ token, user }) {
             if (user) {
                 token.id = user.id;
-                token.role = user.role;
+
+                const dbUser = await prisma.user.findUnique({
+                    where: {
+                        id: user.id,
+                    },
+                    select: {
+                        role: true,
+                    },
+                });
+
+                token.role = dbUser?.role ?? null;
             }
 
             return token;
@@ -135,11 +291,14 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         async session({ session, token }) {
             if (session.user) {
                 session.user.id = token.id as string;
-                session.user.role = token.role as
-                    | "STUDENT"
-                    | "PARENT"
-                    | "TUTOR"
-                    | "ADMIN";
+
+                /*
+                 * Session role must be either a valid role
+                 * or null. Never assign undefined.
+                 */
+                session.user.role =
+                    token.role ??
+                    null;
             }
 
             return session;

@@ -515,36 +515,25 @@ export default function RegisterPage() {
                                     </span>
                                 </div>
                             </div>
-                            <div className="space-y-3">
+                            <div className="grid grid-cols-2 gap-3">
                                 <button
                                     type="button"
                                     onClick={() => signIn("google", { callbackUrl: "/dashboard" })}
-                                    className="w-full flex items-center justify-center gap-3 rounded-lg border border-slate-300 bg-white px-6 py-3.5 text-sm font-semibold text-slate-700 transition hover:bg-slate-50 hover:border-slate-400"
+                                    className="flex items-center justify-center gap-2 rounded-lg border border-slate-300 bg-white px-4 py-3 text-sm font-semibold text-slate-700 transition hover:bg-slate-50"
                                 >
-                                    <svg
-                                        className="h-5 w-5"
-                                        viewBox="0 0 24 24"
-                                        aria-hidden="true"
-                                    >
-                                        <path
-                                            fill="#4285F4"
-                                            d="M21.35 12.23c0-.79-.07-1.55-.2-2.27H12v4.3h5.24a4.48 4.48 0 0 1-1.94 2.94v2.45h3.14c1.84-1.69 2.91-4.18 2.91-7.42Z"
-                                        />
-                                        <path
-                                            fill="#34A853"
-                                            d="M12 21.5c2.63 0 4.84-.87 6.46-2.35l-3.14-2.45c-.87.58-1.98.92-3.32.92-2.55 0-4.71-1.72-5.48-4.03H3.27v2.53A9.75 9.75 0 0 0 12 21.5Z"
-                                        />
-                                        <path
-                                            fill="#FBBC05"
-                                            d="M6.52 13.59A5.86 5.86 0 0 1 6.2 12c0-.55.09-1.08.32-1.59V7.88H3.27A9.74 9.74 0 0 0 2.25 12c0 1.57.38 3.05 1.02 4.12l3.25-2.53Z"
-                                        />
-                                        <path
-                                            fill="#EA4335"
-                                            d="M12 6.38c1.43 0 2.71.49 3.72 1.45l2.79-2.79C16.84 3.45 14.63 2.5 12 2.5a9.75 9.75 0 0 0-8.73 5.38l3.25 2.53C7.29 8.1 9.45 6.38 12 6.38Z"
-                                        />
-                                    </svg>
+                                    <span className="text-lg font-bold">G</span>
+                                    <span>Google</span>
+                                </button>
 
-                                    Sign up with Google
+                                <button
+                                    type="button"
+                                    onClick={() => {
+                                        // Telegram authentication will be connected here
+                                    }}
+                                    className="flex items-center justify-center gap-2 rounded-lg border border-slate-300 bg-white px-4 py-3 text-sm font-semibold text-slate-700 transition hover:bg-slate-50"
+                                >
+                                    <span className="text-lg">✈</span>
+                                    <span>Telegram</span>
                                 </button>
                             </div>
                             {/* ================= LOGIN ================= */}
