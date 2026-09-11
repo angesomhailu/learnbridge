@@ -269,7 +269,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
             return true;
         },
 
-        async jwt({ token, user }) {
+        async jwt({ token, user, trigger, session }) {
             if (user) {
                 token.id = user.id;
 
@@ -283,6 +283,10 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
                 });
 
                 token.role = dbUser?.role ?? null;
+            }
+
+            if (trigger === "update" && session?.role) {
+                token.role = session.role;
             }
 
             return token;

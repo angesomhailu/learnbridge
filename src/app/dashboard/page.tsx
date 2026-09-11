@@ -1,3 +1,4 @@
+
 import { auth } from "@/auth";
 import { redirect } from "next/navigation";
 
@@ -21,7 +22,11 @@ export default async function DashboardPage() {
         case "ADMIN":
             redirect("/admin");
 
+        case null:
+        case undefined:
+            redirect("/social-complete");
+
         default:
-            redirect("/login");
+            redirect("/social-complete");
     }
 }
