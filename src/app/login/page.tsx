@@ -23,166 +23,233 @@ export default function LoginPage() {
 
         let cleanInput = identifier.trim();
 
-        // Normalize phone number
+        // Normalize Ethiopian phone number
         if (/^09\d{8}$/.test(cleanInput)) {
             cleanInput = `+251${cleanInput.substring(1)}`;
         } else if (/^9\d{8}$/.test(cleanInput)) {
             cleanInput = `+251${cleanInput}`;
         }
 
-        // Normalize email only
+        // Normalize email
         if (cleanInput.includes("@")) {
             cleanInput = cleanInput.toLowerCase();
         }
 
-        const result = await signIn("credentials", {
-            identifier: cleanInput,
-            password,
-            redirect: false,
-        });
+        try {
+            const result = await signIn("credentials", {
+                identifier: cleanInput,
+                password,
+                redirect: false,
+            });
 
-        setLoading(false);
+            setLoading(false);
 
-        if (!result || result.error) {
-            setError(
-                "Invalid email/phone number or password. Please check your credentials."
-            );
-            return;
+            if (!result || result.error) {
+                setError(
+                    "Invalid email/phone number or password. Please check your credentials."
+                );
+                return;
+            }
+
+            router.push("/dashboard");
+            router.refresh();
+        } catch (error) {
+            console.error(error);
+            setLoading(false);
+            setError("Something went wrong. Please try again.");
         }
-
-        router.push("/dashboard");
-        router.refresh();
     }
 
     return (
-        <main className="min-h-screen bg-slate-950 font-sans flex items-center justify-center p-6 relative overflow-hidden">
-            {/* Background glow */}
-            <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-80 h-80 rounded-full bg-indigo-600/10 blur-3xl pointer-events-none" />
+        <main className="min-h-screen bg-[#f5f7fa] font-sans text-slate-900">
 
-            <div className="w-full max-w-md bg-slate-900/40 border border-slate-800 p-8 rounded-2xl backdrop-blur-xl shadow-2xl relative z-10">
+            {/* ================= HEADER ================= */}
+            <header className="h-[72px] bg-white border-b border-slate-200">
+                <div className="max-w-7xl mx-auto h-full px-5 sm:px-8 flex items-center justify-between">
 
-                {/* Back to Home */}
-                <div className="mb-6">
-                    <Link
-                        href="/"
-                        className="inline-flex items-center gap-2 text-sm text-slate-400 hover:text-white transition-colors group"
-                    >
-                        <span className="text-lg group-hover:-translate-x-1 transition-transform">
-                            ←
-                        </span>
-                        <span>Back to Home</span>
-                    </Link>
-                </div>
+                    {/* Logo */}
+                    <Link href="/" className="flex items-center gap-3 group">
 
-                {/* Logo + Heading */}
-                <div className="mb-8 text-center">
-                    <Link
-                        href="/"
-                        className="inline-flex items-center gap-3 mb-6 group"
-                    >
-                        <div className="h-11 w-11 overflow-hidden rounded-full bg-gradient-to-tr from-blue-600 to-indigo-600 shadow-lg shadow-indigo-500/25 group-hover:scale-105 transition-transform">
+                        <div className="relative h-10 w-10 overflow-hidden rounded-lg">
                             <Image
                                 src="/learnbridge.png"
-                                alt="LearnBridge Logo"
-                                width={44}
-                                height={44}
+                                alt="LearnBridge"
+                                width={40}
+                                height={40}
                                 className="h-full w-full object-cover"
                                 priority
                             />
                         </div>
 
-                        <span className="font-bold text-xl tracking-tight bg-gradient-to-r from-white to-slate-400 bg-clip-text text-transparent">
-                            LearnBridge
+                        <span className="text-xl font-bold tracking-tight text-slate-900">
+                            Learn<span className="text-blue-600">Bridge</span>
                         </span>
+
                     </Link>
 
-                    <h1 className="text-2xl font-bold text-white tracking-tight">
-                        Welcome Back 👋
-                    </h1>
-
-                    <p className="text-slate-400 text-sm mt-2">
-                        Sign in to continue your learning journey.
-                    </p>
-                </div>
-
-                {/* Login Form */}
-                <form onSubmit={handleSubmit} className="space-y-5">
-                    <div>
-                        <label
-                            htmlFor="identifier"
-                            className="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2"
-                        >
-                            Email or Phone Number
-                        </label>
-
-                        <input
-                            id="identifier"
-                            type="text"
-                            value={identifier}
-                            onChange={(event) =>
-                                setIdentifier(event.target.value)
-                            }
-                            placeholder="you@example.com or +2519XXXXXXXX"
-                            required
-                            autoComplete="username"
-                            className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-white placeholder-slate-600 focus:outline-none focus:border-indigo-500/80 focus:ring-2 focus:ring-indigo-500/10 transition-all text-sm"
-                        />
-
-                        <p className="text-[11px] text-slate-500 mt-1.5">
-                            Sign in using your email address or phone number.
-                        </p>
-                    </div>
-
-                    <div>
-                        <label
-                            htmlFor="password"
-                            className="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2"
-                        >
-                            Password
-                        </label>
-
-                        <input
-                            id="password"
-                            type="password"
-                            value={password}
-                            onChange={(event) =>
-                                setPassword(event.target.value)
-                            }
-                            placeholder="••••••••"
-                            required
-                            autoComplete="current-password"
-                            className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-white placeholder-slate-600 focus:outline-none focus:border-indigo-500/80 focus:ring-2 focus:ring-indigo-500/10 transition-all text-sm"
-                        />
-                    </div>
-
-                    {error && (
-                        <div className="bg-red-500/10 border border-red-500/20 text-red-400 px-4 py-3 rounded-xl text-xs flex items-start gap-2">
-                            <span>⚠</span>
-                            <span>{error}</span>
-                        </div>
-                    )}
-
-                    <button
-                        type="submit"
-                        disabled={loading}
-                        className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 font-semibold text-sm text-white px-6 py-3 rounded-xl disabled:opacity-50 transition-all select-none shadow-lg shadow-indigo-600/10 hover:shadow-indigo-600/30 active:scale-[0.98]"
-                    >
-                        {loading ? "Signing in..." : "Sign In"}
-                    </button>
-                </form>
-
-                {/* Register */}
-                <div className="mt-8 pt-6 border-t border-slate-800 text-center text-xs text-slate-400">
-                    Don&apos;t have an account?{" "}
+                    {/* Back home */}
                     <Link
-                        href="/register"
-                        className="text-indigo-400 font-semibold hover:text-indigo-300 hover:underline transition-colors"
+                        href="/"
+                        className="text-sm font-medium text-slate-600 hover:text-blue-600 transition-colors"
                     >
-                        Create account
+                        Back to home
                     </Link>
+
+                </div>
+            </header>
+
+            {/* ================= MAIN ================= */}
+            <div className="min-h-[calc(100vh-72px)] flex items-center justify-center px-5 py-12">
+
+                <div className="w-full max-w-[470px]">
+
+                    {/* Heading */}
+                    <div className="text-center mb-8">
+
+                        <h1 className="text-3xl sm:text-4xl font-bold tracking-tight text-slate-900">
+                            Welcome back
+                        </h1>
+
+                        <p className="mt-3 text-sm sm:text-base text-slate-600">
+                            Sign in to continue your LearnBridge journey.
+                        </p>
+
+                    </div>
+
+                    {/* ================= CARD ================= */}
+                    <div className="bg-white border border-slate-200 rounded-xl shadow-[0_4px_20px_rgba(15,23,42,0.08)]">
+
+                        <div className="p-7 sm:p-9">
+
+                            <form
+                                onSubmit={handleSubmit}
+                                className="space-y-6"
+                            >
+
+                                {/* Email / Phone */}
+                                <div>
+
+                                    <label
+                                        htmlFor="identifier"
+                                        className="block text-sm font-semibold text-slate-800 mb-2"
+                                    >
+                                        Email or phone number
+                                    </label>
+
+                                    <input
+                                        id="identifier"
+                                        type="text"
+                                        value={identifier}
+                                        onChange={(event) =>
+                                            setIdentifier(event.target.value)
+                                        }
+                                        placeholder="you@example.com or 09XXXXXXXX"
+                                        required
+                                        autoComplete="username"
+                                        className="w-full h-12 px-4 rounded-md border border-slate-300 bg-white text-slate-900 placeholder:text-slate-400 text-sm outline-none transition-all focus:border-blue-600 focus:ring-2 focus:ring-blue-600/15"
+                                    />
+
+                                    <p className="mt-2 text-xs text-slate-500">
+                                        Use the email address or phone number
+                                        associated with your account.
+                                    </p>
+
+                                </div>
+
+                                {/* Password */}
+                                <div>
+
+                                    <div className="flex items-center justify-between mb-2">
+
+                                        <label
+                                            htmlFor="password"
+                                            className="block text-sm font-semibold text-slate-800"
+                                        >
+                                            Password
+                                        </label>
+
+                                        <Link
+                                            href="/forgot-password"
+                                            className="text-xs sm:text-sm font-medium text-blue-600 hover:text-blue-700 hover:underline"
+                                        >
+                                            Forgot password?
+                                        </Link>
+
+                                    </div>
+
+                                    <input
+                                        id="password"
+                                        type="password"
+                                        value={password}
+                                        onChange={(event) =>
+                                            setPassword(event.target.value)
+                                        }
+                                        placeholder="Enter your password"
+                                        required
+                                        autoComplete="current-password"
+                                        className="w-full h-12 px-4 rounded-md border border-slate-300 bg-white text-slate-900 placeholder:text-slate-400 text-sm outline-none transition-all focus:border-blue-600 focus:ring-2 focus:ring-blue-600/15"
+                                    />
+
+                                </div>
+
+                                {/* Error */}
+                                {error && (
+                                    <div className="rounded-md border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+                                        <div className="flex gap-2">
+                                            <span>⚠</span>
+                                            <span>{error}</span>
+                                        </div>
+                                    </div>
+                                )}
+
+                                {/* Submit */}
+                                <button
+                                    type="submit"
+                                    disabled={loading}
+                                    className="w-full h-12 rounded-md bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white font-semibold text-sm transition-colors disabled:cursor-not-allowed disabled:opacity-60"
+                                >
+                                    {loading
+                                        ? "Signing in..."
+                                        : "Sign in"}
+                                </button>
+
+                            </form>
+
+                            {/* Register */}
+                            <div className="mt-7 pt-7 border-t border-slate-200 text-center">
+
+                                <p className="text-sm text-slate-600">
+                                    Don't have a LearnBridge account?
+                                </p>
+
+                                <Link
+                                    href="/register"
+                                    className="inline-block mt-2 text-sm font-semibold text-blue-600 hover:text-blue-700 hover:underline"
+                                >
+                                    Create an account
+                                </Link>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                    {/* Bottom information */}
+                    <div className="mt-7 text-center">
+
+                        <p className="text-xs leading-5 text-slate-500">
+                            By signing in, you agree to use LearnBridge
+                            responsibly and respect the privacy and safety
+                            of other learners and tutors.
+                        </p>
+
+                    </div>
+
                 </div>
 
             </div>
+
         </main>
     );
 }

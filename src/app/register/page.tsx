@@ -7,6 +7,7 @@ import Link from "next/link";
 
 export default function RegisterPage() {
     const router = useRouter();
+
     const [confirmPassword, setConfirmPassword] = useState("");
     const [phone, setPhone] = useState("");
     const [email, setEmail] = useState("");
@@ -21,32 +22,44 @@ export default function RegisterPage() {
     async function handleSubmit(e: FormEvent<HTMLFormElement>) {
         e.preventDefault();
 
-        if (password !== confirmPassword) {
-            setMessage("Passwords do not match.");
-            setIsSuccess(false);
-            return;
-        }
-        setLoading(true);
         setMessage("");
         setIsSuccess(false);
 
+        if (password !== confirmPassword) {
+            setMessage("Passwords do not match.");
+            return;
+        }
+
+        if (password.length < 8) {
+            setMessage("Password must be at least 8 characters.");
+            return;
+        }
+
+        if (!/^9[0-9]{8}$/.test(phone)) {
+            setMessage(
+                "Please enter a valid Ethiopian phone number starting with 9."
+            );
+            return;
+        }
+
+        if (role === "STUDENT" && !dateOfBirth) {
+            setMessage(
+                "Date of birth is required for Student profiles."
+            );
+            return;
+        }
+
+        setLoading(true);
+
         try {
             const payload: Record<string, any> = {
-                email,
+                email: email.trim().toLowerCase(),
                 password,
                 role,
-                phone,
+                phone: `+251${phone}`,
             };
 
             if (role === "STUDENT") {
-                if (!dateOfBirth) {
-                    setMessage(
-                        "Date of birth is required for Student profiles."
-                    );
-                    setLoading(false);
-                    return;
-                }
-
                 payload.dateOfBirth = dateOfBirth;
             }
 
@@ -63,296 +76,458 @@ export default function RegisterPage() {
             if (!response.ok) {
                 setMessage(
                     data.message ||
-                    "Registration failed. Try a different email."
+                    "Registration failed. Please try again."
                 );
+                setLoading(false);
                 return;
             }
 
             setIsSuccess(true);
             setMessage(
-                "Registration successful! Redirecting to login..."
+                "Registration successful! Redirecting you to login..."
             );
 
             setTimeout(() => {
                 router.push("/login");
             }, 1500);
+
         } catch (error) {
             console.error(error);
-            setMessage("Something went wrong. Please try again.");
+            setMessage(
+                "Something went wrong. Please try again."
+            );
         } finally {
             setLoading(false);
         }
     }
 
     return (
-        <main className="min-h-screen bg-slate-950 font-sans flex items-center justify-center p-6 relative overflow-hidden">
+        <main className="min-h-screen bg-[#f5f7fa] font-sans text-slate-900">
 
-            {/* Background glow */}
-            <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-80 h-80 rounded-full bg-indigo-600/10 blur-3xl pointer-events-none" />
+            {/* ================= HEADER ================= */}
+            <header className="h-[72px] bg-white border-b border-slate-200">
 
-            <div className="w-full max-w-md bg-slate-900/40 border border-slate-800 p-8 rounded-2xl backdrop-blur-xl shadow-2xl relative z-10">
+                <div className="max-w-7xl mx-auto h-full px-5 sm:px-8 flex items-center justify-between">
 
-                {/* Back to Home */}
-                <div className="mb-6">
+                    {/* Logo */}
                     <Link
                         href="/"
-                        className="inline-flex items-center gap-2 text-sm text-slate-400 hover:text-white transition-colors group"
+                        className="flex items-center gap-3"
                     >
-                        <span className="text-lg group-hover:-translate-x-1 transition-transform">
-                            ←
-                        </span>
 
-                        <span>Back to Home</span>
-                    </Link>
-                </div>
-
-                {/* Logo + Heading */}
-                <div className="mb-8 text-center">
-
-                    <Link
-                        href="/"
-                        className="inline-flex items-center gap-3 mb-6 group"
-                    >
-                        <div className="h-11 w-11 overflow-hidden rounded-full bg-gradient-to-tr from-blue-600 to-indigo-600 shadow-lg shadow-indigo-500/25 group-hover:scale-105 transition-transform">
+                        <div className="relative h-10 w-10 overflow-hidden rounded-lg">
                             <Image
                                 src="/learnbridge.png"
-                                alt="LearnBridge Logo"
-                                width={44}
-                                height={44}
+                                alt="LearnBridge"
+                                width={40}
+                                height={40}
                                 className="h-full w-full object-cover"
                                 priority
                             />
                         </div>
 
-                        <span className="font-bold text-xl tracking-tight bg-gradient-to-r from-white to-slate-400 bg-clip-text text-transparent">
-                            LearnBridge
+                        <span className="text-xl font-bold tracking-tight text-slate-900">
+                            Learn<span className="text-blue-600">
+                                Bridge
+                            </span>
                         </span>
+
                     </Link>
 
-                    <h1 className="text-2xl font-bold text-white tracking-tight">
-                        Create Account
-                    </h1>
+                    {/* Back */}
+                    <Link
+                        href="/"
+                        className="text-sm font-medium text-slate-600 hover:text-blue-600 transition-colors"
+                    >
+                        Back to home
+                    </Link>
 
-                    <p className="text-slate-400 text-sm mt-2">
-                        Start your learning journey with LearnBridge.
-                    </p>
                 </div>
 
-                {/* Registration Form */}
-                <form onSubmit={handleSubmit} className="space-y-5">
+            </header>
 
-                    {/* Role */}
-                    <div>
-                        <label className="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2">
-                            I am registering as
-                        </label>
+            {/* ================= MAIN ================= */}
+            <div className="flex justify-center px-5 py-10 sm:py-14">
 
-                        <select
-                            value={role}
-                            onChange={(e) => {
-                                setRole(e.target.value);
-                                setDateOfBirth("");
-                            }}
-                            className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-indigo-500/80 focus:ring-2 focus:ring-indigo-500/10 transition-all text-sm"
-                        >
-                            <option value="STUDENT">
-                                Student (Self-study or Children)
-                            </option>
+                <div className="w-full max-w-[520px]">
 
-                            <option value="PARENT">
-                                Parent (Oversee profiles/budgets)
-                            </option>
+                    {/* Heading */}
+                    <div className="text-center mb-8">
 
-                            <option value="TUTOR">
-                                Tutor (Teach & offer subjects)
-                            </option>
-                        </select>
+                        <h1 className="text-3xl sm:text-4xl font-bold tracking-tight text-slate-900">
+                            Create your account
+                        </h1>
+
+                        <p className="mt-3 text-sm sm:text-base text-slate-600">
+                            Join LearnBridge and start your personalized
+                            learning journey.
+                        </p>
+
                     </div>
 
-                    {/* Email */}
-                    <div>
-                        <label
-                            htmlFor="email"
-                            className="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2"
-                        >
-                            Email Address
-                        </label>
+                    {/* ================= CARD ================= */}
+                    <div className="bg-white border border-slate-200 rounded-xl shadow-[0_4px_20px_rgba(15,23,42,0.08)]">
 
-                        <input
-                            id="email"
-                            type="email"
-                            required
-                            value={email}
-                            onChange={(e) => setEmail(e.target.value)}
-                            placeholder="you@example.com"
-                            pattern="^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"
-                            title="Enter a valid email address"
-                            autoComplete="email"
-                            className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-white placeholder-slate-600 focus:outline-none focus:border-indigo-500/80 focus:ring-2 focus:ring-indigo-500/10 transition-all text-sm"
-                        />
-                    </div>
+                        <div className="p-7 sm:p-9">
 
-                    {/* Phone */}
-                    <div>
-                        <label className="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2">
-                            Phone Number
-                        </label>
+                            <form
+                                onSubmit={handleSubmit}
+                                className="space-y-6"
+                            >
 
-                        <div className="flex">
-                            {/* Fixed country code */}
-                            <div className="flex items-center px-4 py-3 bg-slate-900 border border-slate-800 border-r-0 rounded-l-xl text-white text-sm">
-                                +251
+                                {/* ================= ROLE ================= */}
+                                <div>
+
+                                    <label className="block text-sm font-semibold text-slate-800 mb-3">
+                                        I am registering as
+                                    </label>
+
+                                    <div className="grid grid-cols-3 gap-2">
+
+                                        {/* Student */}
+                                        <button
+                                            type="button"
+                                            onClick={() => {
+                                                setRole("STUDENT");
+                                                setDateOfBirth("");
+                                            }}
+                                            className={`h-11 rounded-md border text-sm font-semibold transition-all ${role === "STUDENT"
+                                                ? "border-blue-600 bg-blue-50 text-blue-700 ring-1 ring-blue-600"
+                                                : "border-slate-300 bg-white text-slate-600 hover:border-slate-400"
+                                                }`}
+                                        >
+                                            Student
+                                        </button>
+
+                                        {/* Parent */}
+                                        <button
+                                            type="button"
+                                            onClick={() => {
+                                                setRole("PARENT");
+                                                setDateOfBirth("");
+                                            }}
+                                            className={`h-11 rounded-md border text-sm font-semibold transition-all ${role === "PARENT"
+                                                ? "border-blue-600 bg-blue-50 text-blue-700 ring-1 ring-blue-600"
+                                                : "border-slate-300 bg-white text-slate-600 hover:border-slate-400"
+                                                }`}
+                                        >
+                                            Parent
+                                        </button>
+
+                                        {/* Tutor */}
+                                        <button
+                                            type="button"
+                                            onClick={() => {
+                                                setRole("TUTOR");
+                                                setDateOfBirth("");
+                                            }}
+                                            className={`h-11 rounded-md border text-sm font-semibold transition-all ${role === "TUTOR"
+                                                ? "border-blue-600 bg-blue-50 text-blue-700 ring-1 ring-blue-600"
+                                                : "border-slate-300 bg-white text-slate-600 hover:border-slate-400"
+                                                }`}
+                                        >
+                                            Tutor
+                                        </button>
+
+                                    </div>
+
+                                    <p className="mt-2 text-xs text-slate-500">
+                                        Choose the type of LearnBridge
+                                        account you want to create.
+                                    </p>
+
+                                </div>
+
+                                {/* ================= EMAIL ================= */}
+                                <div>
+
+                                    <label
+                                        htmlFor="email"
+                                        className="block text-sm font-semibold text-slate-800 mb-2"
+                                    >
+                                        Email address
+                                    </label>
+
+                                    <input
+                                        id="email"
+                                        type="email"
+                                        required
+                                        value={email}
+                                        onChange={(e) =>
+                                            setEmail(e.target.value)
+                                        }
+                                        placeholder="you@example.com"
+                                        autoComplete="email"
+                                        pattern="^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"
+                                        title="Enter a valid email address"
+                                        className="w-full h-12 px-4 rounded-md border border-slate-300 bg-white text-slate-900 placeholder:text-slate-400 text-sm outline-none transition-all focus:border-blue-600 focus:ring-2 focus:ring-blue-600/15"
+                                    />
+
+                                </div>
+
+                                {/* ================= PHONE ================= */}
+                                <div>
+
+                                    <label
+                                        htmlFor="phone"
+                                        className="block text-sm font-semibold text-slate-800 mb-2"
+                                    >
+                                        Phone number
+                                    </label>
+
+                                    <div className="flex">
+
+                                        <div className="h-12 px-4 flex items-center bg-slate-50 border border-slate-300 border-r-0 rounded-l-md text-slate-700 text-sm font-medium">
+                                            +251
+                                        </div>
+
+                                        <input
+                                            id="phone"
+                                            type="tel"
+                                            required
+                                            value={phone}
+                                            onChange={(e) => {
+                                                const value =
+                                                    e.target.value
+                                                        .replace(/\D/g, "")
+                                                        .slice(0, 9);
+
+                                                setPhone(value);
+                                            }}
+                                            placeholder="9XX XXX XXX"
+                                            pattern="9[0-9]{8}"
+                                            title="Enter 9 digits starting with 9, for example 912345678"
+                                            autoComplete="tel"
+                                            className="w-full h-12 px-4 rounded-r-md border border-slate-300 bg-white text-slate-900 placeholder:text-slate-400 text-sm outline-none transition-all focus:border-blue-600 focus:ring-2 focus:ring-blue-600/15"
+                                        />
+
+                                    </div>
+
+                                    <p className="mt-2 text-xs text-slate-500">
+                                        Enter your 9-digit Ethiopian phone
+                                        number.
+                                    </p>
+
+                                </div>
+
+                                {/* ================= PASSWORD ================= */}
+                                <div>
+
+                                    <label
+                                        htmlFor="password"
+                                        className="block text-sm font-semibold text-slate-800 mb-2"
+                                    >
+                                        Password
+                                    </label>
+
+                                    <input
+                                        id="password"
+                                        type="password"
+                                        required
+                                        minLength={8}
+                                        value={password}
+                                        onChange={(e) =>
+                                            setPassword(e.target.value)
+                                        }
+                                        placeholder="Minimum 8 characters"
+                                        autoComplete="new-password"
+                                        className="w-full h-12 px-4 rounded-md border border-slate-300 bg-white text-slate-900 placeholder:text-slate-400 text-sm outline-none transition-all focus:border-blue-600 focus:ring-2 focus:ring-blue-600/15"
+                                    />
+
+                                    <p className="mt-2 text-xs text-slate-500">
+                                        Use at least 8 characters.
+                                    </p>
+
+                                </div>
+
+                                {/* ================= CONFIRM PASSWORD ================= */}
+                                <div>
+
+                                    <label
+                                        htmlFor="confirmPassword"
+                                        className="block text-sm font-semibold text-slate-800 mb-2"
+                                    >
+                                        Confirm password
+                                    </label>
+
+                                    <input
+                                        id="confirmPassword"
+                                        type="password"
+                                        required
+                                        minLength={8}
+                                        value={confirmPassword}
+                                        onChange={(e) =>
+                                            setConfirmPassword(
+                                                e.target.value
+                                            )
+                                        }
+                                        placeholder="Re-enter your password"
+                                        autoComplete="new-password"
+                                        className={`w-full h-12 px-4 rounded-md border bg-white text-slate-900 placeholder:text-slate-400 text-sm outline-none transition-all ${confirmPassword &&
+                                            password !==
+                                            confirmPassword
+                                            ? "border-red-400 focus:border-red-500 focus:ring-2 focus:ring-red-500/10"
+                                            : "border-slate-300 focus:border-blue-600 focus:ring-2 focus:ring-blue-600/15"
+                                            }`}
+                                    />
+
+                                    {confirmPassword &&
+                                        password !==
+                                        confirmPassword && (
+                                            <p className="mt-2 text-xs text-red-600">
+                                                Passwords do not match.
+                                            </p>
+                                        )}
+
+                                </div>
+
+                                {/* ================= STUDENT DOB ================= */}
+                                {role === "STUDENT" && (
+                                    <div>
+
+                                        <label
+                                            htmlFor="dateOfBirth"
+                                            className="block text-sm font-semibold text-slate-800 mb-2"
+                                        >
+                                            Date of birth
+                                        </label>
+
+                                        <input
+                                            id="dateOfBirth"
+                                            type="date"
+                                            required
+                                            value={dateOfBirth}
+                                            onChange={(e) =>
+                                                setDateOfBirth(
+                                                    e.target.value
+                                                )
+                                            }
+                                            className="w-full h-12 px-4 rounded-md border border-slate-300 bg-white text-slate-900 text-sm outline-none transition-all focus:border-blue-600 focus:ring-2 focus:ring-blue-600/15"
+                                        />
+
+                                        <div className="mt-3 rounded-md bg-blue-50 border border-blue-100 px-4 py-3">
+
+                                            <p className="text-xs leading-5 text-blue-800">
+                                                <strong>Student safety:</strong>{" "}
+                                                Students under 16 cannot
+                                                independently send tutor
+                                                requests. A parent account
+                                                must manage tutoring requests
+                                                and bookings.
+                                            </p>
+
+                                        </div>
+
+                                    </div>
+                                )}
+
+                                {/* ================= PARENT INFO ================= */}
+                                {role === "PARENT" && (
+                                    <div className="rounded-md bg-blue-50 border border-blue-100 px-4 py-4">
+
+                                        <h3 className="text-sm font-semibold text-slate-800 mb-1">
+                                            Parent account
+                                        </h3>
+
+                                        <p className="text-xs leading-5 text-slate-600">
+                                            After registration, you can add
+                                            student profiles for your children,
+                                            manage tutoring budgets, and submit
+                                            tutor requests on their behalf.
+                                        </p>
+
+                                    </div>
+                                )}
+
+                                {/* ================= TUTOR INFO ================= */}
+                                {role === "TUTOR" && (
+                                    <div className="rounded-md bg-slate-50 border border-slate-200 px-4 py-4">
+
+                                        <h3 className="text-sm font-semibold text-slate-800 mb-1">
+                                            Tutor account
+                                        </h3>
+
+                                        <p className="text-xs leading-5 text-slate-600">
+                                            After creating your account, you
+                                            can complete your tutor profile,
+                                            add subjects, qualifications,
+                                            certificates, availability, and
+                                            other professional information.
+                                        </p>
+
+                                    </div>
+                                )}
+
+                                {/* ================= MESSAGE ================= */}
+                                {message && (
+                                    <div
+                                        className={`rounded-md border px-4 py-3 text-sm ${isSuccess
+                                            ? "border-green-200 bg-green-50 text-green-700"
+                                            : "border-red-200 bg-red-50 text-red-700"
+                                            }`}
+                                    >
+
+                                        <div className="flex gap-2">
+
+                                            <span>
+                                                {isSuccess ? "✓" : "⚠"}
+                                            </span>
+
+                                            <span>{message}</span>
+
+                                        </div>
+
+                                    </div>
+                                )}
+
+                                {/* ================= SUBMIT ================= */}
+                                <button
+                                    type="submit"
+                                    disabled={loading}
+                                    className="w-full h-12 rounded-md bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white font-semibold text-sm transition-colors disabled:cursor-not-allowed disabled:opacity-60"
+                                >
+                                    {loading
+                                        ? "Creating account..."
+                                        : "Create account"}
+                                </button>
+
+                            </form>
+
+                            {/* ================= LOGIN ================= */}
+                            <div className="mt-7 pt-7 border-t border-slate-200 text-center">
+
+                                <p className="text-sm text-slate-600">
+                                    Already have a LearnBridge account?
+                                </p>
+
+                                <Link
+                                    href="/login"
+                                    className="inline-block mt-2 text-sm font-semibold text-blue-600 hover:text-blue-700 hover:underline"
+                                >
+                                    Sign in
+                                </Link>
+
                             </div>
 
-                            {/* User enters only 9 digits */}
-                            <input
-                                type="tel"
-                                required
-                                value={phone}
-                                onChange={(e) => {
-                                    const value = e.target.value.replace(/\D/g, "").slice(0, 9);
-                                    setPhone(value);
-                                }}
-                                placeholder="9XX XXX XXX"
-                                pattern="9[0-9]{8}"
-                                title="Enter 9 digits starting with 9, for example 912345678"
-                                className="w-full bg-slate-950 border border-slate-800 rounded-r-xl px-4 py-3 text-white placeholder-slate-600 focus:outline-none focus:border-indigo-500/80 transition-colors text-sm"
-                            />
                         </div>
 
-                        <p className="text-[11px] text-slate-500 mt-1.5">
-                            Enter your 9-digit Ethiopian phone number.
+                    </div>
+
+                    {/* Footer */}
+                    <div className="mt-7 text-center">
+
+                        <p className="text-xs leading-5 text-slate-500">
+                            LearnBridge connects students, parents, and tutors
+                            to create a safer and more personalized learning
+                            experience.
                         </p>
+
                     </div>
 
-                    {/* Password */}
-                    <div>
-                        <label
-                            htmlFor="password"
-                            className="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2"
-                        >
-                            Password
-                        </label>
-
-                        <input
-                            id="password"
-                            type="password"
-                            required
-                            minLength={8}
-                            value={password}
-                            onChange={(e) => setPassword(e.target.value)}
-                            placeholder="Minimum 8 characters"
-                            autoComplete="new-password"
-                            className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-white placeholder-slate-600 focus:outline-none focus:border-indigo-500/80 focus:ring-2 focus:ring-indigo-500/10 transition-all text-sm"
-                        />
-                    </div>
-
-                    {/* Confirm Password */}
-                    <div>
-                        <label className="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2">
-                            Confirm Password
-                        </label>
-
-                        <input
-                            type="password"
-                            required
-                            minLength={8}
-                            value={confirmPassword}
-                            onChange={(e) => setConfirmPassword(e.target.value)}
-                            placeholder="Re-enter your password"
-                            className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-white placeholder-slate-600 focus:outline-none focus:border-indigo-500/80 transition-colors text-sm"
-                        />
-
-                        {confirmPassword && password !== confirmPassword && (
-                            <p className="text-[11px] text-red-400 mt-1.5">
-                                Passwords do not match.
-                            </p>
-                        )}
-                    </div>
-
-                    {/* Student DOB */}
-                    {role === "STUDENT" && (
-                        <div>
-                            <label
-                                htmlFor="dateOfBirth"
-                                className="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2"
-                            >
-                                Date of Birth
-                            </label>
-
-                            <input
-                                id="dateOfBirth"
-                                type="date"
-                                required
-                                value={dateOfBirth}
-                                onChange={(e) =>
-                                    setDateOfBirth(e.target.value)
-                                }
-                                className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-indigo-500/80 focus:ring-2 focus:ring-indigo-500/10 transition-all text-sm scheme-dark"
-                            />
-
-                            <p className="text-[11px] text-slate-500 mt-1.5 leading-normal">
-                                Students under age 16 cannot send independent
-                                tutor requests. A parent account must manage
-                                tutoring requests and bookings.
-                            </p>
-                        </div>
-                    )}
-
-                    {/* Parent Information */}
-                    {role === "PARENT" && (
-                        <div className="bg-blue-500/5 border border-blue-500/10 rounded-xl p-4 text-[11px] text-slate-400 leading-relaxed">
-                            <span className="mr-1">💡</span>
-
-                            <strong className="text-slate-300">
-                                Parent Account:
-                            </strong>{" "}
-                            After registration, you can add student profiles
-                            for your children, manage tutoring budgets, and
-                            submit tutor requests on their behalf.
-                        </div>
-                    )}
-
-                    {/* Message */}
-                    {message && (
-                        <div
-                            className={`border px-4 py-3 rounded-xl text-xs flex items-start gap-2 ${isSuccess
-                                ? "bg-green-500/10 border-green-500/20 text-green-400"
-                                : "bg-red-500/10 border-red-500/20 text-red-400"
-                                }`}
-                        >
-                            <span className="text-sm">
-                                {isSuccess ? "✓" : "⚠"}
-                            </span>
-
-                            <span>{message}</span>
-                        </div>
-                    )}
-
-                    {/* Submit */}
-                    <button
-                        type="submit"
-                        disabled={loading}
-                        className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 font-semibold text-sm text-white px-6 py-3 rounded-xl disabled:opacity-50 transition-all select-none shadow-lg shadow-indigo-600/10 hover:shadow-indigo-600/30 active:scale-[0.98]"
-                    >
-                        {loading
-                            ? "Creating account..."
-                            : "Create Account"}
-                    </button>
-                </form>
-
-                {/* Login */}
-                <div className="mt-8 pt-6 border-t border-slate-800 text-center text-xs text-slate-400">
-                    Already have an account?{" "}
-
-                    <Link
-                        href="/login"
-                        className="text-indigo-400 font-semibold hover:text-indigo-300 hover:underline transition-colors"
-                    >
-                        Sign in
-                    </Link>
                 </div>
+
             </div>
+
         </main>
     );
 }
