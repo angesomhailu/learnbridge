@@ -136,16 +136,19 @@ export default function TutorDashboardClient({ session }: { session: any }) {
     return (
         <main className="p-6 md:p-10 space-y-8 max-w-7xl mx-auto">
             {/* Header Banner */}
-            <div className="rounded-3xl bg-gradient-to-r from-slate-900 via-slate-800 to-indigo-950 text-white p-6 md:p-8 shadow-lg relative overflow-hidden flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+            <div className="bg-blue flex flex-col justify-between gap-4 md:flex-row md:items-end">
                 <div className="space-y-2 relative z-10 max-w-xl">
-                    <div className="inline-flex items-center gap-2 rounded-full border border-emerald-500/30 bg-emerald-500/20 px-3 py-1 text-xs font-bold text-emerald-300">
+                    <div className="inline-flex items-center gap-2 rounded-full border border-emerald-500/30 bg-gradient-500/20 px-3 py-1 text-xs font-bold text-emerald-300">
                         <ShieldCheck className="h-4 w-4 text-emerald-400" />
                         Verified Educator Account
                     </div>
-                    <h1 className="text-2xl md:text-3xl font-extrabold tracking-tight">
-                        Welcome back, {session?.user?.email?.split("@")[0]}!
+                    <h1 className="text-2xl font-bold tracking-tight text-slate-900 md:text-3xl">
+                        Welcome back,{" "}
+                        <span className="text-blue-700">
+                            {session?.user?.name || "Tutor"}
+                        </span>
                     </h1>
-                    <p className="text-xs md:text-sm text-slate-300 leading-relaxed">
+                    <p className="text-xs md:text-sm text-black-100 leading-relaxed">
                         Manage your teaching schedule, accept student tutoring requests, and monitor student academic performance.
                     </p>
                 </div>

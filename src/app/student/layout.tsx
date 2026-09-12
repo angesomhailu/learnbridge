@@ -15,6 +15,7 @@ import {
     CreditCard,
     User,
     Settings,
+    ChevronDown,
     LogOut,
     Menu,
     X,
@@ -90,25 +91,25 @@ const menuItems = [
     },
 ];
 
-const accountItems = [
-    {
-        name: "Profile",
-        href: "/student/profile",
-        icon: User,
-    },
-    {
-        name: "Settings",
-        href: "/student/settings",
-        icon: Settings,
-    },
-];
+// const accountItems = [
+//     {
+//         name: "Profile",
+//         href: "/student/profile",
+//         icon: User,
+//     },
+//     {
+//         name: "Settings",
+//         href: "/student/settings",
+//         icon: Settings,
+//     },
+// ];
 
 export default function StudentLayout({
     children,
 }: StudentLayoutProps) {
     const pathname = usePathname();
     const { data: session } = useSession();
-
+    const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
     const handleLogout = async () => {
@@ -125,7 +126,7 @@ export default function StudentLayout({
         setIsSidebarOpen(false);
     };
 
-    const currentRoute = [...menuItems, ...accountItems].find(
+    const currentRoute = menuItems.find(
         (item) =>
             item.href === pathname ||
             (item.href !== "/student" &&
@@ -192,7 +193,7 @@ export default function StudentLayout({
                     <button
                         type="button"
                         aria-label="Notifications"
-                        className="relative flex h-10 w-10 items-center justify-center rounded-lg text-slate-600 transition hover:bg-slate-100 hover:text-blue-600"
+                        className="relative flex h-10 w-10 cursor-pointer items-center justify-center rounded-lg text-slate-600 transition hover:bg-slate-100 hover:text-blue-600"
                     >
                         <Bell className="h-5 w-5" />
 
@@ -200,24 +201,92 @@ export default function StudentLayout({
                     </button>
 
                     {/* Profile */}
-                    <Link
-                        href="/student/profile"
-                        className="hidden items-center gap-2 rounded-lg px-2 py-1.5 transition hover:bg-slate-100 sm:flex"
-                    >
-                        <div className="flex h-8 w-8 items-center justify-center rounded-full bg-blue-100 text-blue-700">
-                            <User className="h-4 w-4" />
-                        </div>
+                    <div className="relative">
+                        <button
+                            type="button"
+                            onClick={() =>
+                                setIsProfileMenuOpen((prev) => !prev)
+                            }
+                            aria-expanded={isProfileMenuOpen}
+                            className="hidden cursor-pointer items-center gap-2 rounded-lg px-2 py-1.5 transition hover:bg-slate-100 sm:flex"
+                        >
+                            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-blue-100 text-blue-700">
+                                <User className="h-4 w-4" />
+                            </div>
 
-                        <div className="hidden lg:block">
-                            <p className="max-w-[140px] truncate text-xs font-semibold text-slate-700">
-                                {session?.user?.name || "Student"}
-                            </p>
+                            <div className="hidden text-left lg:block">
+                                <p className="max-w-[140px] truncate text-xs font-semibold text-slate-700">
+                                    {session?.user?.name || "Student"}
+                                </p>
 
-                            <p className="text-[10px] text-slate-500">
-                                Student
-                            </p>
-                        </div>
-                    </Link>
+                                <p className="text-[10px] text-slate-500">
+                                    Student
+                                </p>
+                            </div>
+
+                            <ChevronDown className="hidden h-4 w-4 text-slate-400 lg:block" />
+                        </button>
+
+                        {isProfileMenuOpen && (
+                            <>
+                                <button
+                                    type="button"
+                                    aria-label="Close profile menu"
+                                    onClick={() =>
+                                        setIsProfileMenuOpen(false)
+                                    }
+                                    className="fixed inset-0 z-40 cursor-default"
+                                />
+
+                                <div className="absolute right-0 top-12 z-50 w-56 overflow-hidden rounded-xl border border-slate-200 bg-white shadow-xl">
+                                    <div className="border-b border-slate-100 px-4 py-3">
+                                        <p className="truncate text-sm font-semibold text-slate-800">
+                                            {session?.user?.name || "Student"}
+                                        </p>
+
+                                        <p className="truncate text-xs text-slate-500">
+                                            {session?.user?.email || ""}
+                                        </p>
+                                    </div>
+
+                                    <div className="p-2">
+                                        <Link
+                                            href="/student/profile"
+                                            onClick={() =>
+                                                setIsProfileMenuOpen(false)
+                                            }
+                                            className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-slate-600 transition hover:bg-slate-100 hover:text-blue-600"
+                                        >
+                                            <User className="h-4 w-4" />
+                                            <span>Profile</span>
+                                        </Link>
+
+                                        <Link
+                                            href="/student/settings"
+                                            onClick={() =>
+                                                setIsProfileMenuOpen(false)
+                                            }
+                                            className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-slate-600 transition hover:bg-slate-100 hover:text-blue-600"
+                                        >
+                                            <Settings className="h-4 w-4" />
+                                            <span>Settings</span>
+                                        </Link>
+
+                                        <div className="my-2 border-t border-slate-100" />
+
+                                        <button
+                                            type="button"
+                                            onClick={handleLogout}
+                                            className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-slate-600 transition hover:bg-red-50 hover:text-red-600"
+                                        >
+                                            <LogOut className="h-4 w-4" />
+                                            <span>Sign Out</span>
+                                        </button>
+                                    </div>
+                                </div>
+                            </>
+                        )}
+                    </div>
                 </div>
             </header>
 
@@ -319,59 +388,6 @@ export default function StudentLayout({
                             })}
                         </nav>
                     </div>
-
-                    {/* ACCOUNT */}
-                    <div className="mt-7">
-                        <p className="mb-2 px-3 text-[10px] font-bold uppercase tracking-wider text-slate-400">
-                            Account
-                        </p>
-
-                        <nav className="space-y-1">
-                            {accountItems.map((item) => {
-                                const Icon = item.icon;
-
-                                const isActive =
-                                    pathname === item.href ||
-                                    pathname.startsWith(
-                                        `${item.href}/`
-                                    );
-
-                                return (
-                                    <Link
-                                        key={item.href}
-                                        href={item.href}
-                                        onClick={closeSidebar}
-                                        className={`group flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition ${isActive
-                                            ? "bg-blue-600 text-white shadow-sm"
-                                            : "text-slate-600 hover:bg-slate-200 hover:text-slate-900"
-                                            }`}
-                                    >
-                                        <Icon
-                                            className={`h-4.5 w-4.5 shrink-0 ${isActive
-                                                ? "text-white"
-                                                : "text-slate-500 group-hover:text-blue-600"
-                                                }`}
-                                        />
-
-                                        <span>{item.name}</span>
-                                    </Link>
-                                );
-                            })}
-                        </nav>
-                    </div>
-                </div>
-
-                {/* Sidebar Footer */}
-                <div className="border-t border-slate-200 p-3">
-                    <button
-                        type="button"
-                        onClick={handleLogout}
-                        className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-slate-600 transition hover:bg-red-50 hover:text-red-600"
-                    >
-                        <LogOut className="h-4.5 w-4.5" />
-
-                        <span>Sign Out</span>
-                    </button>
                 </div>
             </aside>
 

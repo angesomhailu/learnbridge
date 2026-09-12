@@ -5,6 +5,7 @@ declare module "next-auth" {
     interface Session {
         user: {
             id: string;
+            name?: string | null;
             email?: string | null;
             role:
             | "STUDENT"
@@ -17,6 +18,7 @@ declare module "next-auth" {
 
     interface User {
         id: string;
+        name?: string | null;
         email?: string | null;
         role:
         | "STUDENT"

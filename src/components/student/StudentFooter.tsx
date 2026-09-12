@@ -44,6 +44,12 @@ export default function StudentFooter() {
                         <Link href="/terms" className="hover:text-slate-900 transition-colors">
                             Terms of Service
                         </Link>
+                        <Link
+                            href="/help"
+                            className="hover:text-slate-900 transition-colors"
+                        >
+                            Help & Support
+                        </Link>
                     </div>
                     <p>
                         &copy; {new Date().getFullYear()} LearnBridge Platform. All rights reserved.

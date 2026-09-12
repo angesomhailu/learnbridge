@@ -114,10 +114,6 @@ export default function HomePage() {
         <div className="mx-auto grid max-w-7xl items-center gap-14 px-6 pb-20 pt-16 lg:grid-cols-2 lg:px-8 lg:pb-28 lg:pt-24">
           {/* Left */}
           <div className="relative z-10">
-            <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-blue-200 bg-blue-50 px-4 py-2 text-sm font-semibold text-blue-700">
-              <span className="h-2 w-2 rounded-full bg-blue-600" />
-              Smarter tutoring starts here
-            </div>
 
             <h1 className="max-w-3xl text-4xl font-bold leading-tight tracking-tight text-slate-950 sm:text-5xl lg:text-6xl">
               Find the right tutor.
@@ -169,21 +165,8 @@ export default function HomePage() {
 
           {/* Dashboard Preview */}
           <div className="relative z-10">
-            <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-[0_20px_60px_rgba(15,23,42,0.10)] sm:p-6">
+            <div className="rounded-2xl border border-slate-200 bg-white  shadow-[0_20px_60px_rgba(15,23,42,0.10)] sm:p-6">
               {/* Fake browser/header */}
-              <div className="mb-5 flex items-center justify-between border-b border-slate-200 pb-4">
-                <div className="flex items-center gap-2">
-                  <span className="h-3 w-3 rounded-full bg-slate-300" />
-                  <span className="h-3 w-3 rounded-full bg-slate-300" />
-                  <span className="h-3 w-3 rounded-full bg-slate-300" />
-                </div>
-
-                <div className="rounded-md bg-slate-100 px-4 py-1.5 text-xs text-slate-500">
-                  learnbridge
-                </div>
-
-                <div className="h-7 w-7 rounded-full bg-blue-100" />
-              </div>
 
               <div className="mb-6">
                 <p className="text-xs font-semibold uppercase tracking-wider text-slate-500">
@@ -259,29 +242,6 @@ export default function HomePage() {
                 <button className="mt-5 w-full rounded-lg bg-blue-600 px-4 py-3 text-sm font-bold text-white transition hover:bg-blue-700">
                   View Tutor Match
                 </button>
-              </div>
-
-              <div className="mt-4 flex items-center justify-center gap-2 text-xs font-medium text-slate-500">
-                <span className="text-green-600">●</span>
-                Safe connection
-              </div>
-            </div>
-
-            {/* Small floating card */}
-            <div className="absolute -bottom-5 -left-5 hidden rounded-xl border border-slate-200 bg-white p-4 shadow-lg sm:block">
-              <div className="flex items-center gap-3">
-                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-green-50 text-green-600">
-                  ✓
-                </div>
-
-                <div>
-                  <p className="text-xs font-bold text-slate-900">
-                    Tutor verified
-                  </p>
-                  <p className="text-[11px] text-slate-500">
-                    Ready to learn
-                  </p>
-                </div>
               </div>
             </div>
           </div>
@@ -498,9 +458,11 @@ export default function HomePage() {
 
       {/* FOOTER */}
       <footer className="border-t border-slate-200 bg-white">
-        <div className="mx-auto max-w-7xl px-6 py-10 lg:px-8">
-          <div className="flex flex-col gap-8 md:flex-row md:items-center md:justify-between">
-            <div className="flex items-center gap-3">
+        <div className="mx-auto max-w-7xl px-6 py-6 lg:px-8">
+          <div className="flex flex-col gap-5 md:flex-row md:items-center md:justify-between">
+
+            {/* Logo + Brand */}
+            <div className="flex shrink-0 items-center gap-3">
               <Image
                 src="/learnbridge.png"
                 alt="LearnBridge"
@@ -520,7 +482,8 @@ export default function HomePage() {
               </div>
             </div>
 
-            <div className="flex flex-wrap gap-6 text-sm text-slate-500">
+            {/* Links */}
+            <div className="flex items-center gap-6 text-sm text-slate-500">
               <a
                 href="#"
                 className="transition hover:text-blue-600"
@@ -542,13 +505,15 @@ export default function HomePage() {
                 Support
               </a>
             </div>
-          </div>
 
-          <div className="mt-8 border-t border-slate-200 pt-6 text-center text-xs text-slate-500 md:text-left">
-            © {new Date().getFullYear()} LearnBridge. All rights reserved.
+            {/* Copyright */}
+            <div className="shrink-0 text-xs text-slate-500">
+              © {new Date().getFullYear()} LearnBridge. All rights reserved.
+            </div>
           </div>
         </div>
       </footer>
+
     </main>
   );
 }

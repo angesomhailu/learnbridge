@@ -1,290 +1,451 @@
 "use client";
 
 import { useState } from "react";
+import { useSession, signOut } from "next-auth/react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { signOut } from "next-auth/react";
 import {
     LayoutDashboard,
     ClipboardList,
     CalendarDays,
     MessageSquare,
+    BookOpen,
     Clock,
     DollarSign,
-    BookOpen,
     GraduationCap,
-    FileCheck,
+    FileText,
     User,
+    Settings,
     LogOut,
-    ShieldCheck,
     Menu,
+    ChevronDown,
     X,
     Bell,
     ChevronRight,
 } from "lucide-react";
+
 import TutorFooter from "@/components/tutor/TutorFooter";
 
-const navItems = [
-    { name: "Overview Hub", href: "/tutor", icon: LayoutDashboard },
-    { name: "Student Requests", href: "/tutor/requests", icon: ClipboardList },
-    { name: "Sessions & Bookings", href: "/tutor/bookings", icon: CalendarDays },
-    { name: "Messages", href: "/tutor/messages", icon: MessageSquare },
-    { name: "Teaching Availability", href: "/tutor/availability", icon: Clock },
-    { name: "Pricing & Rates", href: "/tutor/pricing", icon: DollarSign },
-    { name: "Subjects Competency", href: "/tutor/subjects", icon: BookOpen },
-    { name: "Academic Education", href: "/tutor/education", icon: GraduationCap },
-    { name: "Verification Docs", href: "/tutor/documents", icon: FileCheck },
-    { name: "Profile Settings", href: "/tutor/profile", icon: User },
+interface TutorLayoutProps {
+    children: React.ReactNode;
+}
+
+const teachingItems = [
+    {
+        name: "Dashboard",
+        href: "/tutor",
+        icon: LayoutDashboard,
+    },
+    {
+        name: "Tutor Requests",
+        href: "/tutor/requests",
+        icon: ClipboardList,
+    },
+    {
+        name: "My Bookings",
+        href: "/tutor/bookings",
+        icon: CalendarDays,
+    },
+    {
+        name: "Messages",
+        href: "/tutor/messages",
+        icon: MessageSquare,
+    },
+    {
+        name: "Subjects",
+        href: "/tutor/subjects",
+        icon: BookOpen,
+    },
+    {
+        name: "Availability",
+        href: "/tutor/availability",
+        icon: Clock,
+    },
+    {
+        name: "Pricing",
+        href: "/tutor/pricing",
+        icon: DollarSign,
+    },
 ];
 
-export default function TutorLayout({ children }: { children: React.ReactNode }) {
-    const pathname = usePathname();
-    const [mobileOpen, setMobileOpen] = useState(false);
+const credentialItems = [
+    {
+        name: "Education",
+        href: "/tutor/education",
+        icon: GraduationCap,
+    },
+    {
+        name: "Documents",
+        href: "/tutor/documents",
+        icon: FileText,
+    },
+];
 
-    const handleSignOut = async () => {
+const accountItems = [
+    {
+        name: "Profile",
+        href: "/tutor/profile",
+        icon: User,
+    },
+    {
+        name: "Settings",
+        href: "/tutor/settings",
+        icon: Settings,
+    },
+];
+
+export default function TutorLayout({
+    children,
+}: TutorLayoutProps) {
+    const pathname = usePathname();
+    const { data: session } = useSession();
+    const [isProfileMenuOpen, setIsProfileMenuOpen] =
+        useState(false);
+    const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+
+    const handleLogout = async () => {
         try {
-            await signOut({ callbackUrl: "/login" });
+            await signOut({
+                callbackUrl: "/login",
+            });
         } catch {
             window.location.href = "/login";
         }
     };
 
-    const currentRoute = navItems.find(
+    const closeSidebar = () => {
+        setIsSidebarOpen(false);
+    };
+
+    const allItems = [
+        ...teachingItems,
+        ...credentialItems,
+        ...accountItems,
+    ];
+
+    const currentRoute = allItems.find(
         (item) =>
             item.href === pathname ||
-            (item.href !== "/tutor" && pathname.startsWith(item.href))
+            (item.href !== "/tutor" &&
+                pathname.startsWith(item.href))
     );
 
-    return (
-        <div className="min-h-screen bg-slate-50 flex flex-col font-sans text-slate-900">
-            {/* Desktop Sidebar Navigation */}
-            <aside className="fixed left-0 top-0 z-40 hidden h-screen w-64 bg-slate-900 text-slate-300 md:flex flex-col justify-between p-5 border-r border-slate-800/80 shrink-0">
-                <div className="space-y-6">
-                    {/* Brand */}
-                    <Link href="/tutor" className="flex items-center gap-3 px-2 pt-1">
-                        <div className="h-10 w-10 rounded-2xl bg-gradient-to-br from-emerald-500 to-indigo-600 flex items-center justify-center font-black text-white text-xl shadow-md">
-                            L
-                        </div>
-                        <div>
-                            <span className="font-black text-base text-white tracking-tight block">
-                                LearnBridge
-                            </span>
-                            <span className="text-[10px] uppercase tracking-wider font-extrabold text-emerald-400 block -mt-1">
-                                Educator Portal
-                            </span>
-                        </div>
-                    </Link>
+    const renderNavigation = (
+        items:
+            | typeof teachingItems
+            | typeof credentialItems
+            | typeof accountItems
+    ) => {
+        return (
+            <nav className="space-y-1">
+                {items.map((item) => {
+                    const Icon = item.icon;
 
-                    {/* Verification Status Pill */}
-                    <div className="rounded-2xl border border-emerald-500/20 bg-emerald-500/10 p-3.5 space-y-1">
-                        <div className="flex items-center gap-2 text-xs font-extrabold text-emerald-300">
-                            <ShieldCheck className="h-4 w-4 text-emerald-400" />
-                            Verified Educator
-                        </div>
-                        <p className="text-[10px] text-slate-400 leading-snug">
-                            Your credentials & identity documents are active. Ready to accept student requests.
-                        </p>
-                    </div>
-
-                    {/* Navigation Items */}
-                    <nav className="space-y-1 overflow-y-auto max-h-[calc(100vh-280px)] pr-1">
-                        {navItems.map((item) => {
-                            const Icon = item.icon;
-                            const active =
-                                pathname === item.href ||
-                                (item.href !== "/tutor" && pathname.startsWith(item.href));
-
-                            return (
-                                <Link
-                                    key={item.href}
-                                    href={item.href}
-                                    className={`flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold transition group ${active
-                                        ? "bg-emerald-600 text-white shadow-sm shadow-emerald-600/30"
-                                        : "text-slate-400 hover:bg-slate-800 hover:text-white"
-                                        }`}
-                                >
-                                    <Icon
-                                        className={`h-4 w-4 transition-colors ${active ? "text-white" : "text-slate-400 group-hover:text-emerald-400"
-                                            }`}
-                                    />
-                                    <span>{item.name}</span>
-                                </Link>
+                    const isActive =
+                        item.href === "/tutor"
+                            ? pathname === "/tutor"
+                            : pathname === item.href ||
+                            pathname.startsWith(
+                                `${item.href}/`
                             );
-                        })}
-                    </nav>
-                </div>
 
-                {/* Desktop Sign Out */}
-                <div className="pt-4 border-t border-slate-800/80">
-                    <button
-                        onClick={handleSignOut}
-                        className="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold text-rose-400 hover:bg-rose-950/40 hover:text-rose-300 transition"
-                    >
-                        <LogOut className="h-4 w-4" />
-                        <span>Sign Out</span>
-                    </button>
-                </div>
-            </aside>
+                    return (
+                        <Link
+                            key={item.href}
+                            href={item.href}
+                            onClick={closeSidebar}
+                            className={`group flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition ${isActive
+                                ? "bg-blue-600 text-white shadow-sm"
+                                : "text-slate-600 hover:bg-slate-200 hover:text-slate-900"
+                                }`}
+                        >
+                            <Icon
+                                className={`h-[18px] w-[18px] shrink-0 ${isActive
+                                    ? "text-white"
+                                    : "text-slate-500 group-hover:text-blue-600"
+                                    }`}
+                            />
 
-            {/* Mobile & Desktop Top Header Navbar */}
-            <header className="sticky top-0 z-30 flex h-16 items-center justify-between border-b border-slate-200 bg-white/95 backdrop-blur px-4 sm:px-6 md:ml-64 shadow-xs">
+                            <span>{item.name}</span>
+                        </Link>
+                    );
+                })}
+            </nav>
+        );
+    };
+
+    return (
+        <div className="flex min-h-screen flex-col bg-[#e5e9ee] font-sans text-slate-800">
+            {/* TOP BAR */}
+            <header className="sticky top-0 z-40 flex h-16 items-center justify-between border-b border-slate-200 bg-[#f7f8fa] px-4 shadow-sm sm:px-6">
                 <div className="flex items-center gap-3">
-                    {/* Sandwich / Hamburger Toggle Button (Mobile) */}
+                    {/* MENU BUTTON */}
                     <button
-                        onClick={() => setMobileOpen(!mobileOpen)}
-                        className="rounded-xl p-2 text-slate-700 hover:bg-slate-100 md:hidden focus:outline-hidden"
-                        aria-label="Toggle Navigation Sandwich Menu"
+                        type="button"
+                        onClick={() =>
+                            setIsSidebarOpen(true)
+                        }
+                        aria-label="Open navigation menu"
+                        aria-expanded={isSidebarOpen}
+                        className="flex h-10 w-10 items-center justify-center rounded-lg border border-slate-200 bg-white text-slate-700 shadow-sm transition hover:bg-slate-100 hover:text-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
                     >
-                        {mobileOpen ? (
-                            <X className="h-6 w-6 text-slate-900" />
-                        ) : (
-                            <Menu className="h-6 w-6 text-slate-900" />
-                        )}
+                        <Menu className="h-5 w-5" />
                     </button>
 
-                    {/* Logo (Mobile view) */}
-                    <Link href="/tutor" className="flex items-center gap-2 md:hidden">
-                        <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-gradient-to-br from-emerald-500 to-indigo-600 text-white font-bold text-sm">
-                            L
+                    {/* LOGO */}
+                    <Link
+                        href="/tutor"
+                        onClick={closeSidebar}
+                        className="flex items-center gap-2"
+                    >
+                        <div className="flex h-9 w-9 items-center justify-center overflow-hidden rounded-lg bg-white">
+                            <img
+                                src="/learnbridge.png"
+                                alt="LearnBridge"
+                                className="h-full w-full object-contain"
+                            />
                         </div>
-                        <span className="font-bold text-slate-900 text-base tracking-tight">
-                            LearnBridge <span className="text-xs text-emerald-600 font-semibold">Educator</span>
-                        </span>
-                    </Link>
 
-                    {/* Active Section Breadcrumb (Desktop view) */}
-                    <div className="hidden md:flex items-center gap-2 text-sm text-slate-500">
-                        <span>Educator Portal</span>
-                        <ChevronRight className="h-4 w-4 text-slate-300" />
-                        <span className="font-semibold text-slate-900">
-                            {currentRoute?.name || "Overview Hub"}
+                        <div className="hidden sm:block">
+                            <p className="text-sm font-bold text-slate-800">
+                                LearnBridge
+                            </p>
+
+                            <p className="text-[10px] font-medium uppercase tracking-wide text-slate-500">
+                                Tutor Portal
+                            </p>
+                        </div>
+                    </Link>
+                </div>
+
+                {/* RIGHT SIDE */}
+                <div className="flex items-center gap-2 sm:gap-4">
+                    <div className="hidden items-center gap-2 text-sm text-slate-500 md:flex">
+                        <span>Tutor</span>
+
+                        <ChevronRight className="h-4 w-4 text-slate-400" />
+
+                        <span className="font-medium text-slate-700">
+                            {currentRoute?.name ??
+                                "Dashboard"}
                         </span>
                     </div>
-                </div>
 
-                {/* Right Utilities (Notifications, Profile, Logout) */}
-                <div className="flex items-center gap-3">
-                    <Link
-                        href="/tutor/messages"
-                        className="relative rounded-xl p-2 text-slate-600 hover:bg-slate-100 transition"
-                        title="Student Messages & Requests"
+                    {/* NOTIFICATIONS */}
+                    <button
+                        type="button"
+                        aria-label="Notifications"
+                        className="relative flex h-10 w-10 items-center justify-center rounded-lg text-slate-600 transition hover:bg-slate-100 hover:text-blue-600"
                     >
                         <Bell className="h-5 w-5" />
-                        <span className="absolute top-1.5 right-1.5 h-2 w-2 rounded-full bg-emerald-500 ring-2 ring-white"></span>
-                    </Link>
 
-                    <div className="h-6 w-px bg-slate-200 hidden sm:block"></div>
-
-                    <Link
-                        href="/tutor/profile"
-                        className="flex items-center gap-2.5 rounded-xl p-1.5 hover:bg-slate-50 transition"
-                    >
-                        <div className="flex h-8 w-8 items-center justify-center rounded-full bg-emerald-100 text-emerald-800 font-bold text-xs">
-                            TU
-                        </div>
-                        <span className="hidden sm:block text-xs font-semibold text-slate-800">
-                            Tutor Account
-                        </span>
-                    </Link>
-
-                    <button
-                        onClick={handleSignOut}
-                        className="hidden sm:flex items-center gap-1.5 rounded-xl border border-slate-200 px-3 py-1.5 text-xs font-semibold text-slate-700 hover:bg-rose-50 hover:text-rose-600 hover:border-rose-200 transition"
-                    >
-                        <LogOut className="h-3.5 w-3.5" />
-                        Sign Out
+                        <span className="absolute right-2 top-2 h-2 w-2 rounded-full bg-blue-600 ring-2 ring-[#f7f8fa]" />
                     </button>
+                    {/* USER */}
+                    <div className="relative">
+                        <button
+                            type="button"
+                            onClick={() =>
+                                setIsProfileMenuOpen(
+                                    (prev) => !prev
+                                )
+                            }
+                            aria-expanded={
+                                isProfileMenuOpen
+                            }
+                            className="hidden cursor-pointer items-center gap-2 rounded-lg px-2 py-1.5 transition hover:bg-slate-100 sm:flex"
+                        >
+                            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-blue-100 text-blue-700">
+                                <User className="h-4 w-4" />
+                            </div>
+
+                            <div className="hidden text-left lg:block">
+                                <p className="max-w-[140px] truncate text-xs font-semibold text-slate-700">
+                                    {session?.user?.name ||
+                                        "Tutor"}
+                                </p>
+
+                                <p className="text-[10px] text-slate-500">
+                                    Tutor
+                                </p>
+                            </div>
+
+                            <ChevronDown className="hidden h-4 w-4 text-slate-400 lg:block" />
+                        </button>
+
+                        {isProfileMenuOpen && (
+                            <>
+                                {/* DROPDOWN OVERLAY */}
+                                <button
+                                    type="button"
+                                    aria-label="Close profile menu"
+                                    onClick={() =>
+                                        setIsProfileMenuOpen(
+                                            false
+                                        )
+                                    }
+                                    className="fixed inset-0 z-40 cursor-default"
+                                />
+
+                                {/* DROPDOWN */}
+                                <div className="absolute right-0 top-12 z-50 w-56 overflow-hidden rounded-xl border border-slate-200 bg-white shadow-xl">
+                                    {/* USER INFORMATION */}
+                                    <div className="border-b border-slate-100 px-4 py-3">
+                                        <p className="truncate text-sm font-semibold text-slate-800">
+                                            {session?.user?.name ||
+                                                "Tutor"}
+                                        </p>
+
+                                        <p className="truncate text-xs text-slate-500">
+                                            {session?.user?.email ||
+                                                ""}
+                                        </p>
+                                    </div>
+
+                                    <div className="p-2">
+                                        {/* PROFILE */}
+                                        <Link
+                                            href="/tutor/profile"
+                                            onClick={() =>
+                                                setIsProfileMenuOpen(
+                                                    false
+                                                )
+                                            }
+                                            className="flex cursor-pointer items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-slate-600 transition hover:bg-slate-100 hover:text-blue-600"
+                                        >
+                                            <User className="h-4 w-4" />
+
+                                            <span>
+                                                Profile
+                                            </span>
+                                        </Link>
+
+                                        {/* SETTINGS */}
+                                        <Link
+                                            href="/tutor/settings"
+                                            onClick={() =>
+                                                setIsProfileMenuOpen(
+                                                    false
+                                                )
+                                            }
+                                            className="flex cursor-pointer items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-slate-600 transition hover:bg-slate-100 hover:text-blue-600"
+                                        >
+                                            <Settings className="h-4 w-4" />
+
+                                            <span>
+                                                Settings
+                                            </span>
+                                        </Link>
+
+                                        <div className="my-2 border-t border-slate-100" />
+
+                                        {/* SIGN OUT */}
+                                        <button
+                                            type="button"
+                                            onClick={
+                                                handleLogout
+                                            }
+                                            className="flex w-full cursor-pointer items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-slate-600 transition hover:bg-red-50 hover:text-red-600"
+                                        >
+                                            <LogOut className="h-4 w-4" />
+
+                                            <span>
+                                                Sign Out
+                                            </span>
+                                        </button>
+                                    </div>
+                                </div>
+                            </>
+                        )}
+                    </div>
                 </div>
             </header>
 
-            {/* Sandwich Mobile Drawer Navigation */}
-            {mobileOpen && (
-                <div className="fixed inset-0 z-50 md:hidden flex">
-                    {/* Backdrop */}
-                    <div
-                        className="fixed inset-0 bg-slate-950/70 backdrop-blur-xs transition-opacity"
-                        onClick={() => setMobileOpen(false)}
-                    />
-
-                    {/* Drawer Content */}
-                    <div className="relative flex w-full max-w-xs flex-col bg-slate-900 p-6 shadow-2xl z-10 text-slate-300">
-                        <div className="flex items-center justify-between border-b border-slate-800 pb-4">
-                            <Link
-                                href="/tutor"
-                                className="flex items-center gap-3"
-                                onClick={() => setMobileOpen(false)}
-                            >
-                                <div className="flex h-9 w-9 items-center justify-center rounded-2xl bg-gradient-to-br from-emerald-500 to-indigo-600 text-white font-bold">
-                                    L
-                                </div>
-                                <div>
-                                    <h2 className="font-bold text-white tracking-tight">LearnBridge</h2>
-                                    <p className="text-xs text-emerald-400 font-bold uppercase tracking-wider">
-                                        Educator Portal
-                                    </p>
-                                </div>
-                            </Link>
-
-                            <button
-                                onClick={() => setMobileOpen(false)}
-                                className="rounded-lg p-2 text-slate-400 hover:bg-slate-800 hover:text-white"
-                            >
-                                <X className="h-5 w-5" />
-                            </button>
-                        </div>
-
-                        {/* Navigation Links */}
-                        <div className="flex-1 overflow-y-auto py-6 space-y-1">
-                            <p className="px-3 mb-3 text-xs font-bold uppercase tracking-wider text-slate-400">
-                                Educator Menu
-                            </p>
-                            {navItems.map((item) => {
-                                const Icon = item.icon;
-                                const active =
-                                    pathname === item.href ||
-                                    (item.href !== "/tutor" && pathname.startsWith(item.href));
-
-                                return (
-                                    <Link
-                                        key={item.href}
-                                        href={item.href}
-                                        onClick={() => setMobileOpen(false)}
-                                        className={`flex items-center gap-3 rounded-xl px-3.5 py-3 text-sm font-semibold transition ${active
-                                            ? "bg-emerald-600 text-white"
-                                            : "text-slate-400 hover:bg-slate-800 hover:text-white"
-                                            }`}
-                                    >
-                                        <Icon className="h-5 w-5" />
-                                        <span>{item.name}</span>
-                                    </Link>
-                                );
-                            })}
-                        </div>
-
-                        {/* Mobile Drawer Sign Out */}
-                        <div className="border-t border-slate-800 pt-4">
-                            <button
-                                onClick={() => {
-                                    setMobileOpen(false);
-                                    handleSignOut();
-                                }}
-                                className="flex w-full items-center gap-3 rounded-xl bg-rose-950/40 px-4 py-3 text-sm font-bold text-rose-300 hover:bg-rose-900/60 transition"
-                            >
-                                <LogOut className="h-5 w-5 text-rose-400" />
-                                Sign Out
-                            </button>
-                        </div>
-                    </div>
-                </div>
+            {/* OVERLAY */}
+            {isSidebarOpen && (
+                <button
+                    type="button"
+                    aria-label="Close navigation menu"
+                    onClick={closeSidebar}
+                    className="fixed inset-0 z-40 bg-slate-900/40 backdrop-blur-[1px]"
+                />
             )}
 
-            {/* Main Content Area */}
-            <main className="flex-1 min-w-0 bg-slate-50 md:ml-64 flex flex-col min-h-[calc(100vh-64px)]">
+            {/* SLIDE-IN SIDEBAR */}
+            <aside
+                className={`fixed left-0 top-0 z-50 flex h-screen w-72 flex-col border-r border-slate-200 bg-[#f7f8fa] shadow-2xl transition-transform duration-300 ease-in-out ${isSidebarOpen
+                    ? "translate-x-0"
+                    : "-translate-x-full"
+                    }`}
+            >
+                {/* SIDEBAR HEADER */}
+                <div className="flex h-16 items-center justify-between border-b border-slate-200 px-4">
+                    <Link
+                        href="/tutor"
+                        onClick={closeSidebar}
+                        className="flex items-center gap-3"
+                    >
+                        <div className="flex h-9 w-9 items-center justify-center overflow-hidden rounded-lg bg-white">
+                            <img
+                                src="/learnbridge.png"
+                                alt="LearnBridge"
+                                className="h-full w-full object-contain"
+                            />
+                        </div>
+
+                        <div>
+                            <p className="text-sm font-bold text-slate-800">
+                                LearnBridge
+                            </p>
+
+                            <p className="text-[10px] font-medium uppercase tracking-wide text-slate-500">
+                                Tutor Portal
+                            </p>
+                        </div>
+                    </Link>
+
+                    <button
+                        type="button"
+                        onClick={closeSidebar}
+                        aria-label="Close navigation menu"
+                        className="flex h-9 w-9 items-center justify-center rounded-lg text-slate-500 transition hover:bg-slate-200 hover:text-slate-800"
+                    >
+                        <X className="h-5 w-5" />
+                    </button>
+                </div>
+
+                {/* NAVIGATION */}
+                <div className="flex-1 overflow-y-auto px-3 py-5">
+                    {/* TEACHING */}
+                    <div>
+                        <p className="mb-2 px-3 text-[10px] font-bold uppercase tracking-wider text-slate-400">
+                            Teaching
+                        </p>
+
+                        {renderNavigation(
+                            teachingItems
+                        )}
+                    </div>
+
+                    {/* CREDENTIALS */}
+                    <div className="mt-7">
+                        <p className="mb-2 px-3 text-[10px] font-bold uppercase tracking-wider text-slate-400">
+                            Credentials
+                        </p>
+
+                        {renderNavigation(
+                            credentialItems
+                        )}
+                    </div>
+                </div>
+            </aside>
+
+            {/* CONTENT */}
+            <main className="flex min-w-0 flex-1 flex-col">
                 <div className="flex-1 p-4 sm:p-6 lg:p-8">
                     {children}
                 </div>
 
-                {/* Useful Educator Footer */}
                 <TutorFooter />
             </main>
         </div>

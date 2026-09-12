@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import { useSession } from "next-auth/react";
 import {
     Users,
     ClipboardList,
@@ -156,9 +157,7 @@ export default function ParentDashboardClient({
         ]);
     }
 
-    const parentName =
-        session?.user?.email?.split("@")[0] ||
-        "Parent";
+    const parentName = session?.user?.name || "Parent";
 
     return (
         <div className="min-h-screen bg-[#e5e9ee] text-slate-800">
@@ -243,28 +242,6 @@ export default function ParentDashboardClient({
                         >
                             <MessageSquare className="h-4 w-4" />
                             Messages
-                        </Link>
-                    </nav>
-
-                    <p className="mt-8 px-3 pb-2 text-[10px] font-bold uppercase tracking-widest text-slate-400">
-                        Account
-                    </p>
-
-                    <nav className="space-y-1">
-                        <Link
-                            href="/parent/profile"
-                            className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-slate-600 transition hover:bg-slate-200 hover:text-slate-900"
-                        >
-                            <UserRound className="h-4 w-4" />
-                            Profile
-                        </Link>
-
-                        <Link
-                            href="/parent/settings"
-                            className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-slate-600 transition hover:bg-slate-200 hover:text-slate-900"
-                        >
-                            <Settings className="h-4 w-4" />
-                            Settings
                         </Link>
                     </nav>
                 </div>
@@ -403,50 +380,6 @@ export default function ParentDashboardClient({
             ====================================================== */}
 
             <div className="lg:pl-64">
-                {/* Top Application Bar */}
-                <header className="hidden h-16 items-center justify-between border-b border-slate-300 bg-[#f5f6f8] px-8 lg:flex">
-                    <div>
-                        <p className="text-xs font-medium text-slate-500">
-                            Parent Portal
-                        </p>
-
-                        <p className="text-sm font-semibold text-slate-800">
-                            Learning Management Dashboard
-                        </p>
-                    </div>
-
-                    <div className="flex items-center gap-3">
-                        <button
-                            type="button"
-                            className="relative rounded-lg border border-slate-300 bg-white p-2 text-slate-600 hover:bg-slate-100"
-                        >
-                            <Bell className="h-4 w-4" />
-
-                            <span className="absolute right-1 top-1 h-1.5 w-1.5 rounded-full bg-blue-600" />
-                        </button>
-
-                        <div className="h-7 w-px bg-slate-300" />
-
-                        <div className="flex items-center gap-2">
-                            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-blue-100 text-xs font-bold text-blue-700">
-                                {parentName
-                                    .charAt(0)
-                                    .toUpperCase()}
-                            </div>
-
-                            <div className="hidden xl:block">
-                                <p className="max-w-[160px] truncate text-xs font-bold text-slate-800">
-                                    {parentName}
-                                </p>
-
-                                <p className="text-[10px] text-slate-500">
-                                    Parent
-                                </p>
-                            </div>
-                        </div>
-                    </div>
-                </header>
-
                 {/* =================================================
                     CONTENT
                 ================================================== */}
@@ -466,7 +399,7 @@ export default function ParentDashboardClient({
                                 <h1 className="text-2xl font-bold tracking-tight text-slate-900 md:text-3xl">
                                     Welcome back,{" "}
                                     <span className="text-blue-700">
-                                        {parentName}
+                                        {session?.user?.name || "Parent"}
                                     </span>
                                 </h1>
 
@@ -736,8 +669,8 @@ export default function ParentDashboardClient({
                                                     <div className="flex items-center gap-2 sm:justify-end">
                                                         <span
                                                             className={`rounded-full px-2 py-1 text-[9px] font-bold ${child.independentRequestEligible
-                                                                    ? "bg-emerald-100 text-emerald-700"
-                                                                    : "bg-amber-100 text-amber-700"
+                                                                ? "bg-emerald-100 text-emerald-700"
+                                                                : "bg-amber-100 text-amber-700"
                                                                 }`}
                                                         >
                                                             {child.independentRequestEligible
@@ -1010,29 +943,6 @@ export default function ParentDashboardClient({
                             )}
                         </div>
                     </section>
-
-                    {/* Footer */}
-                    <footer className="mt-8 flex flex-col gap-2 border-t border-slate-300 pt-5 text-[10px] text-slate-500 sm:flex-row sm:items-center sm:justify-between">
-                        <p>
-                            LearnBridge Parent Portal
-                        </p>
-
-                        <div className="flex items-center gap-4">
-                            <Link
-                                href="/parent/settings"
-                                className="hover:text-blue-600"
-                            >
-                                Settings
-                            </Link>
-
-                            <Link
-                                href="/help"
-                                className="hover:text-blue-600"
-                            >
-                                Help & Support
-                            </Link>
-                        </div>
-                    </footer>
                 </main>
             </div>
         </div>
