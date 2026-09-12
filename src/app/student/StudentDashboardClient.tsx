@@ -21,12 +21,12 @@ import {
     ClipboardList,
     UserCircle,
     Settings,
-    Menu,
-    Bell,
-    ChevronRight,
+    //Menu,
+    //Bell,
+    //ChevronRight,
     Clock3,
     CheckCircle2,
-    CircleAlert,
+    //CircleAlert,
 } from "lucide-react";
 
 type Subject = {
@@ -104,7 +104,7 @@ export default function StudentDashboardClient({
 }: {
     session: any;
 }) {
-    const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+    //const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
     // Profile / eligibility
     const [independentEligible, setIndependentEligible] = useState(true);
@@ -273,8 +273,8 @@ export default function StudentDashboardClient({
             booking.status === "PENDING"
     );
 
-    const studentName =
-        session?.user?.email?.split("@")[0] || "Student";
+    //const studentName =
+    //session?.user?.email?.split("@")[0] || "Student";
 
     function formatDate(date: string) {
         try {

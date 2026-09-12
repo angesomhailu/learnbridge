@@ -1,10 +1,10 @@
 "use client";
 
 import { useState } from "react";
-import { useSession } from "next-auth/react";
+import { useSession, signOut } from "next-auth/react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { signOut } from "next-auth/react";
+
 import {
     LayoutDashboard,
     Search,
@@ -91,26 +91,17 @@ const menuItems = [
     },
 ];
 
-// const accountItems = [
-//     {
-//         name: "Profile",
-//         href: "/student/profile",
-//         icon: User,
-//     },
-//     {
-//         name: "Settings",
-//         href: "/student/settings",
-//         icon: Settings,
-//     },
-// ];
-
 export default function StudentLayout({
     children,
 }: StudentLayoutProps) {
     const pathname = usePathname();
     const { data: session } = useSession();
-    const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
-    const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+
+    const [isProfileMenuOpen, setIsProfileMenuOpen] =
+        useState(false);
+
+    const [isSidebarOpen, setIsSidebarOpen] =
+        useState(false);
 
     const handleLogout = async () => {
         try {
@@ -134,19 +125,25 @@ export default function StudentLayout({
     );
 
     return (
-        <div className="min-h-screen bg-[#e5e9ee] text-slate-800 flex flex-col font-sans">
+        <div className="flex min-h-screen flex-col bg-[#e5e9ee] font-sans text-slate-800">
+
             {/* =========================================================
                 TOP APPLICATION BAR
             ========================================================= */}
             <header className="sticky top-0 z-40 flex h-16 items-center justify-between border-b border-slate-200 bg-[#f7f8fa] px-4 shadow-sm sm:px-6">
+
+                {/* LEFT SIDE */}
                 <div className="flex items-center gap-3">
+
                     {/* SANDWICH BUTTON */}
                     <button
                         type="button"
-                        onClick={() => setIsSidebarOpen(true)}
+                        onClick={() =>
+                            setIsSidebarOpen(true)
+                        }
                         aria-label="Open navigation menu"
                         aria-expanded={isSidebarOpen}
-                        className="flex h-10 w-10 items-center justify-center rounded-lg border border-slate-200 bg-white text-slate-700 shadow-sm transition hover:bg-slate-100 hover:text-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        className="flex h-10 w-10 cursor-pointer items-center justify-center rounded-lg border border-slate-200 bg-white text-slate-700 shadow-sm transition hover:bg-slate-100 hover:text-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
                     >
                         <Menu className="h-5 w-5" />
                     </button>
@@ -169,6 +166,7 @@ export default function StudentLayout({
                             <p className="text-sm font-bold text-slate-800">
                                 LearnBridge
                             </p>
+
                             <p className="text-[10px] font-medium uppercase tracking-wide text-slate-500">
                                 Student Portal
                             </p>
@@ -176,20 +174,24 @@ export default function StudentLayout({
                     </Link>
                 </div>
 
-                {/* RIGHT SIDE */}
+                {/* =====================================================
+                    RIGHT SIDE
+                ====================================================== */}
                 <div className="flex items-center gap-2 sm:gap-4">
-                    {/* Breadcrumb / Current Page */}
+
+                    {/* BREADCRUMB */}
                     <div className="hidden items-center gap-2 text-sm text-slate-500 md:flex">
                         <span>Student</span>
 
                         <ChevronRight className="h-4 w-4 text-slate-400" />
 
                         <span className="font-medium text-slate-700">
-                            {currentRoute?.name ?? "Dashboard"}
+                            {currentRoute?.name ??
+                                "Dashboard"}
                         </span>
                     </div>
 
-                    {/* Notification */}
+                    {/* NOTIFICATION */}
                     <button
                         type="button"
                         aria-label="Notifications"
@@ -200,14 +202,18 @@ export default function StudentLayout({
                         <span className="absolute right-2 top-2 h-2 w-2 rounded-full bg-blue-600 ring-2 ring-[#f7f8fa]" />
                     </button>
 
-                    {/* Profile */}
+                    {/* PROFILE */}
                     <div className="relative">
                         <button
                             type="button"
                             onClick={() =>
-                                setIsProfileMenuOpen((prev) => !prev)
+                                setIsProfileMenuOpen(
+                                    (prev) => !prev
+                                )
                             }
-                            aria-expanded={isProfileMenuOpen}
+                            aria-expanded={
+                                isProfileMenuOpen
+                            }
                             className="hidden cursor-pointer items-center gap-2 rounded-lg px-2 py-1.5 transition hover:bg-slate-100 sm:flex"
                         >
                             <div className="flex h-8 w-8 items-center justify-center rounded-full bg-blue-100 text-blue-700">
@@ -216,7 +222,8 @@ export default function StudentLayout({
 
                             <div className="hidden text-left lg:block">
                                 <p className="max-w-[140px] truncate text-xs font-semibold text-slate-700">
-                                    {session?.user?.name || "Student"}
+                                    {session?.user?.name ||
+                                        "Student"}
                                 </p>
 
                                 <p className="text-[10px] text-slate-500">
@@ -229,58 +236,85 @@ export default function StudentLayout({
 
                         {isProfileMenuOpen && (
                             <>
+                                {/* PROFILE MENU OVERLAY */}
                                 <button
                                     type="button"
                                     aria-label="Close profile menu"
                                     onClick={() =>
-                                        setIsProfileMenuOpen(false)
+                                        setIsProfileMenuOpen(
+                                            false
+                                        )
                                     }
                                     className="fixed inset-0 z-40 cursor-default"
                                 />
 
+                                {/* PROFILE DROPDOWN */}
                                 <div className="absolute right-0 top-12 z-50 w-56 overflow-hidden rounded-xl border border-slate-200 bg-white shadow-xl">
+
+                                    {/* USER INFORMATION */}
                                     <div className="border-b border-slate-100 px-4 py-3">
                                         <p className="truncate text-sm font-semibold text-slate-800">
-                                            {session?.user?.name || "Student"}
+                                            {session?.user?.name ||
+                                                "Student"}
                                         </p>
 
                                         <p className="truncate text-xs text-slate-500">
-                                            {session?.user?.email || ""}
+                                            {session?.user?.email ||
+                                                ""}
                                         </p>
                                     </div>
 
                                     <div className="p-2">
+
+                                        {/* PROFILE */}
                                         <Link
                                             href="/student/profile"
                                             onClick={() =>
-                                                setIsProfileMenuOpen(false)
+                                                setIsProfileMenuOpen(
+                                                    false
+                                                )
                                             }
-                                            className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-slate-600 transition hover:bg-slate-100 hover:text-blue-600"
+                                            className="flex cursor-pointer items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-slate-600 transition hover:bg-slate-100 hover:text-blue-600"
                                         >
                                             <User className="h-4 w-4" />
-                                            <span>Profile</span>
+
+                                            <span>
+                                                Profile
+                                            </span>
                                         </Link>
 
+                                        {/* SETTINGS */}
                                         <Link
                                             href="/student/settings"
                                             onClick={() =>
-                                                setIsProfileMenuOpen(false)
+                                                setIsProfileMenuOpen(
+                                                    false
+                                                )
                                             }
-                                            className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-slate-600 transition hover:bg-slate-100 hover:text-blue-600"
+                                            className="flex cursor-pointer items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-slate-600 transition hover:bg-slate-100 hover:text-blue-600"
                                         >
                                             <Settings className="h-4 w-4" />
-                                            <span>Settings</span>
+
+                                            <span>
+                                                Settings
+                                            </span>
                                         </Link>
 
                                         <div className="my-2 border-t border-slate-100" />
 
+                                        {/* SIGN OUT */}
                                         <button
                                             type="button"
-                                            onClick={handleLogout}
-                                            className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-slate-600 transition hover:bg-red-50 hover:text-red-600"
+                                            onClick={
+                                                handleLogout
+                                            }
+                                            className="flex w-full cursor-pointer items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-slate-600 transition hover:bg-red-50 hover:text-red-600"
                                         >
                                             <LogOut className="h-4 w-4" />
-                                            <span>Sign Out</span>
+
+                                            <span>
+                                                Sign Out
+                                            </span>
                                         </button>
                                     </div>
                                 </div>
@@ -291,14 +325,14 @@ export default function StudentLayout({
             </header>
 
             {/* =========================================================
-                DARK OVERLAY
+                SIDEBAR OVERLAY
             ========================================================= */}
             {isSidebarOpen && (
                 <button
                     type="button"
                     aria-label="Close navigation menu"
                     onClick={closeSidebar}
-                    className="fixed inset-0 z-40 bg-slate-900/40 backdrop-blur-[1px]"
+                    className="fixed inset-0 z-40 cursor-default bg-slate-900/40 backdrop-blur-[1px]"
                 />
             )}
 
@@ -311,7 +345,7 @@ export default function StudentLayout({
                     : "-translate-x-full"
                     }`}
             >
-                {/* Sidebar Header */}
+                {/* SIDEBAR HEADER */}
                 <div className="flex h-16 items-center justify-between border-b border-slate-200 px-4">
                     <Link
                         href="/student"
@@ -342,15 +376,18 @@ export default function StudentLayout({
                         type="button"
                         onClick={closeSidebar}
                         aria-label="Close navigation menu"
-                        className="flex h-9 w-9 items-center justify-center rounded-lg text-slate-500 transition hover:bg-slate-200 hover:text-slate-800"
+                        className="flex h-9 w-9 cursor-pointer items-center justify-center rounded-lg text-slate-500 transition hover:bg-slate-200 hover:text-slate-800"
                     >
                         <X className="h-5 w-5" />
                     </button>
                 </div>
 
-                {/* Navigation */}
+                {/* =====================================================
+                    NAVIGATION
+                ====================================================== */}
                 <div className="flex-1 overflow-y-auto px-3 py-5">
-                    {/* MAIN MENU */}
+
+                    {/* LEARNING */}
                     <div>
                         <p className="mb-2 px-3 text-[10px] font-bold uppercase tracking-wider text-slate-400">
                             Learning
@@ -361,28 +398,36 @@ export default function StudentLayout({
                                 const Icon = item.icon;
 
                                 const isActive =
-                                    item.href === "/student"
-                                        ? pathname === "/student"
-                                        : pathname.startsWith(item.href);
+                                    item.href ===
+                                        "/student"
+                                        ? pathname ===
+                                        "/student"
+                                        : pathname ===
+                                        item.href ||
+                                        pathname.startsWith(
+                                            `${item.href}/`
+                                        );
 
                                 return (
                                     <Link
                                         key={item.href}
                                         href={item.href}
                                         onClick={closeSidebar}
-                                        className={`group flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition ${isActive
+                                        className={`group flex cursor-pointer items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition ${isActive
                                             ? "bg-blue-600 text-white shadow-sm"
                                             : "text-slate-600 hover:bg-slate-200 hover:text-slate-900"
                                             }`}
                                     >
                                         <Icon
-                                            className={`h-4.5 w-4.5 shrink-0 ${isActive
+                                            className={`h-[18px] w-[18px] shrink-0 ${isActive
                                                 ? "text-white"
                                                 : "text-slate-500 group-hover:text-blue-600"
                                                 }`}
                                         />
 
-                                        <span>{item.name}</span>
+                                        <span>
+                                            {item.name}
+                                        </span>
                                     </Link>
                                 );
                             })}

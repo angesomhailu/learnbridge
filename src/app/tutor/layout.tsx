@@ -99,9 +99,12 @@ export default function TutorLayout({
 }: TutorLayoutProps) {
     const pathname = usePathname();
     const { data: session } = useSession();
+
     const [isProfileMenuOpen, setIsProfileMenuOpen] =
         useState(false);
-    const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+
+    const [isSidebarOpen, setIsSidebarOpen] =
+        useState(false);
 
     const handleLogout = async () => {
         try {
@@ -154,7 +157,7 @@ export default function TutorLayout({
                             key={item.href}
                             href={item.href}
                             onClick={closeSidebar}
-                            className={`group flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition ${isActive
+                            className={`group flex cursor-pointer items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition ${isActive
                                 ? "bg-blue-600 text-white shadow-sm"
                                 : "text-slate-600 hover:bg-slate-200 hover:text-slate-900"
                                 }`}
@@ -176,10 +179,16 @@ export default function TutorLayout({
 
     return (
         <div className="flex min-h-screen flex-col bg-[#e5e9ee] font-sans text-slate-800">
-            {/* TOP BAR */}
+
+            {/* =====================================================
+                TOP BAR
+            ====================================================== */}
             <header className="sticky top-0 z-40 flex h-16 items-center justify-between border-b border-slate-200 bg-[#f7f8fa] px-4 shadow-sm sm:px-6">
+
+                {/* LEFT SIDE */}
                 <div className="flex items-center gap-3">
-                    {/* MENU BUTTON */}
+
+                    {/* HAMBURGER */}
                     <button
                         type="button"
                         onClick={() =>
@@ -187,7 +196,7 @@ export default function TutorLayout({
                         }
                         aria-label="Open navigation menu"
                         aria-expanded={isSidebarOpen}
-                        className="flex h-10 w-10 items-center justify-center rounded-lg border border-slate-200 bg-white text-slate-700 shadow-sm transition hover:bg-slate-100 hover:text-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        className="flex h-10 w-10 cursor-pointer items-center justify-center rounded-lg border border-slate-200 bg-white text-slate-700 shadow-sm transition hover:bg-slate-100 hover:text-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
                     >
                         <Menu className="h-5 w-5" />
                     </button>
@@ -220,6 +229,8 @@ export default function TutorLayout({
 
                 {/* RIGHT SIDE */}
                 <div className="flex items-center gap-2 sm:gap-4">
+
+                    {/* BREADCRUMB */}
                     <div className="hidden items-center gap-2 text-sm text-slate-500 md:flex">
                         <span>Tutor</span>
 
@@ -235,12 +246,13 @@ export default function TutorLayout({
                     <button
                         type="button"
                         aria-label="Notifications"
-                        className="relative flex h-10 w-10 items-center justify-center rounded-lg text-slate-600 transition hover:bg-slate-100 hover:text-blue-600"
+                        className="relative flex h-10 w-10 cursor-pointer items-center justify-center rounded-lg text-slate-600 transition hover:bg-slate-100 hover:text-blue-600"
                     >
                         <Bell className="h-5 w-5" />
 
                         <span className="absolute right-2 top-2 h-2 w-2 rounded-full bg-blue-600 ring-2 ring-[#f7f8fa]" />
                     </button>
+
                     {/* USER */}
                     <div className="relative">
                         <button
@@ -289,6 +301,7 @@ export default function TutorLayout({
 
                                 {/* DROPDOWN */}
                                 <div className="absolute right-0 top-12 z-50 w-56 overflow-hidden rounded-xl border border-slate-200 bg-white shadow-xl">
+
                                     {/* USER INFORMATION */}
                                     <div className="border-b border-slate-100 px-4 py-3">
                                         <p className="truncate text-sm font-semibold text-slate-800">
@@ -303,6 +316,7 @@ export default function TutorLayout({
                                     </div>
 
                                     <div className="p-2">
+
                                         {/* PROFILE */}
                                         <Link
                                             href="/tutor/profile"
@@ -361,17 +375,21 @@ export default function TutorLayout({
                 </div>
             </header>
 
-            {/* OVERLAY */}
+            {/* =====================================================
+                SIDEBAR OVERLAY
+            ====================================================== */}
             {isSidebarOpen && (
                 <button
                     type="button"
                     aria-label="Close navigation menu"
                     onClick={closeSidebar}
-                    className="fixed inset-0 z-40 bg-slate-900/40 backdrop-blur-[1px]"
+                    className="fixed inset-0 z-40 cursor-default bg-slate-900/40 backdrop-blur-[1px]"
                 />
             )}
 
-            {/* SLIDE-IN SIDEBAR */}
+            {/* =====================================================
+                SLIDE-IN SIDEBAR
+            ====================================================== */}
             <aside
                 className={`fixed left-0 top-0 z-50 flex h-screen w-72 flex-col border-r border-slate-200 bg-[#f7f8fa] shadow-2xl transition-transform duration-300 ease-in-out ${isSidebarOpen
                     ? "translate-x-0"
@@ -404,18 +422,22 @@ export default function TutorLayout({
                         </div>
                     </Link>
 
+                    {/* CLOSE BUTTON */}
                     <button
                         type="button"
                         onClick={closeSidebar}
                         aria-label="Close navigation menu"
-                        className="flex h-9 w-9 items-center justify-center rounded-lg text-slate-500 transition hover:bg-slate-200 hover:text-slate-800"
+                        className="flex h-9 w-9 cursor-pointer items-center justify-center rounded-lg text-slate-500 transition hover:bg-slate-200 hover:text-slate-800"
                     >
                         <X className="h-5 w-5" />
                     </button>
                 </div>
 
-                {/* NAVIGATION */}
+                {/* =================================================
+                    NAVIGATION
+                ================================================== */}
                 <div className="flex-1 overflow-y-auto px-3 py-5">
+
                     {/* TEACHING */}
                     <div>
                         <p className="mb-2 px-3 text-[10px] font-bold uppercase tracking-wider text-slate-400">
@@ -437,10 +459,23 @@ export default function TutorLayout({
                             credentialItems
                         )}
                     </div>
+
+                    {/* ACCOUNT */}
+                    <div className="mt-7">
+                        <p className="mb-2 px-3 text-[10px] font-bold uppercase tracking-wider text-slate-400">
+                            Account
+                        </p>
+
+                        {renderNavigation(
+                            accountItems
+                        )}
+                    </div>
                 </div>
             </aside>
 
-            {/* CONTENT */}
+            {/* =====================================================
+                MAIN CONTENT
+            ====================================================== */}
             <main className="flex min-w-0 flex-1 flex-col">
                 <div className="flex-1 p-4 sm:p-6 lg:p-8">
                     {children}

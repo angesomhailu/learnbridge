@@ -53,6 +53,62 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         }),
 
         Credentials({
+            id: "telegram",
+            name: "Telegram",
+            credentials: {
+                telegramId: { label: "Telegram ID", type: "text" },
+                email: { label: "Email", type: "text" },
+                name: { label: "Name", type: "text" },
+                username: { label: "Username", type: "text" },
+            },
+            async authorize(credentials) {
+                if (!credentials?.telegramId) return null;
+
+                const telegramId = credentials.telegramId as string;
+                const emailInput = credentials.email as string;
+                const username = credentials.username as string;
+
+                const primaryEmail = (
+                    emailInput ||
+                    (username ? `${username}@telegram.learnbridge` : `tg_${telegramId}@telegram.learnbridge`)
+                ).toLowerCase().trim();
+
+                let user = await prisma.user.findFirst({
+                    where: {
+                        OR: [
+                            { email: primaryEmail },
+                            { email: `tg_${telegramId}@telegram.learnbridge` },
+                        ],
+                    },
+                });
+
+                if (!user) {
+                    user = await prisma.user.create({
+                        data: {
+                            email: primaryEmail,
+                            passwordHash: null,
+                            role: null,
+                            status: "PENDING",
+                        },
+                    });
+                }
+
+                if (
+                    user.status === "SUSPENDED" ||
+                    user.status === "DEACTIVATED"
+                ) {
+                    return null;
+                }
+
+                return {
+                    id: user.id,
+                    email: user.email ?? undefined,
+                    role: user.role ?? null,
+                };
+            },
+        }),
+
+        Credentials({
             name: "Credentials",
 
             credentials: {
