@@ -110,9 +110,9 @@ export default function ParentLayout({
     return (
         <div className="flex min-h-screen flex-col bg-[#e5e9ee] font-sans text-slate-800">
             {/* =========================================================
-                TOP APPLICATION BAR
+                TOP APPLICATION BAR (NETACAD NAVY)
             ========================================================= */}
-            <header className="sticky top-0 z-40 flex h-16 items-center justify-between border-b border-slate-200 bg-[#f7f8fa] px-4 shadow-sm sm:px-6">
+            <header className="sticky top-0 z-40 flex h-16 items-center justify-between border-b border-[#001f35] bg-[#002b49] px-4 shadow-md sm:px-6 text-white">
                 <div className="flex items-center gap-3">
                     {/* SANDWICH BUTTON */}
                     <button
@@ -122,7 +122,7 @@ export default function ParentLayout({
                         }
                         aria-label="Open navigation menu"
                         aria-expanded={isSidebarOpen}
-                        className="flex h-10 w-10 cursor-pointer items-center justify-center rounded-lg border border-slate-200 bg-white text-slate-700 shadow-sm transition hover:bg-slate-100 hover:text-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        className="flex h-10 w-10 cursor-pointer items-center justify-center rounded-xl border border-white/20 bg-white/10 text-white shadow-sm transition hover:bg-white/20 hover:text-sky-300 focus:outline-none focus:ring-2 focus:ring-sky-400"
                     >
                         <Menu className="h-5 w-5" />
                     </button>
@@ -130,10 +130,10 @@ export default function ParentLayout({
                     {/* LOGO */}
                     <Link
                         href="/parent"
-                        className="flex items-center gap-2"
+                        className="flex items-center gap-2.5"
                         onClick={closeSidebar}
                     >
-                        <div className="flex h-9 w-9 items-center justify-center overflow-hidden rounded-lg bg-white">
+                        <div className="flex h-9 w-9 items-center justify-center overflow-hidden rounded-xl bg-white/10 p-1 border border-white/20">
                             <img
                                 src="/learnbridge.png"
                                 alt="LearnBridge"
@@ -142,12 +142,13 @@ export default function ParentLayout({
                         </div>
 
                         <div className="hidden sm:block">
-                            <p className="text-sm font-bold text-slate-800">
-                                LearnBridge
+                            <p className="text-sm font-extrabold tracking-tight text-white flex items-center gap-1.5">
+                                Learn<span className="text-sky-400">Bridge</span>
+                                <span className="text-[9px] uppercase font-extrabold bg-sky-500/20 text-sky-300 px-1.5 py-0.5 rounded-full border border-sky-400/30">Parent</span>
                             </p>
 
-                            <p className="text-[10px] font-medium uppercase tracking-wide text-slate-500">
-                                Parent Portal
+                            <p className="text-[9px] font-semibold uppercase tracking-widest text-sky-200/70">
+                                Cisco NetAcad Guardian Portal
                             </p>
                         </div>
                     </Link>
@@ -158,12 +159,12 @@ export default function ParentLayout({
                 ===================================================== */}
                 <div className="flex items-center gap-2 sm:gap-4">
                     {/* BREADCRUMB */}
-                    <div className="hidden items-center gap-2 text-sm text-slate-500 md:flex">
-                        <span>Parent</span>
+                    <div className="hidden items-center gap-2 text-xs text-sky-200/80 md:flex font-semibold">
+                        <span>Parent Portal</span>
 
-                        <ChevronRight className="h-4 w-4 text-slate-400" />
+                        <ChevronRight className="h-3.5 w-3.5 text-sky-400" />
 
-                        <span className="font-medium text-slate-700">
+                        <span className="font-bold text-white bg-white/10 px-2.5 py-1 rounded-lg border border-white/10">
                             {currentRoute?.name ??
                                 "Dashboard"}
                         </span>
@@ -173,11 +174,11 @@ export default function ParentLayout({
                     <button
                         type="button"
                         aria-label="Notifications"
-                        className="relative flex h-10 w-10 cursor-pointer items-center justify-center rounded-lg text-slate-600 transition hover:bg-slate-100 hover:text-blue-600"
+                        className="relative flex h-10 w-10 cursor-pointer items-center justify-center rounded-xl text-sky-100 transition hover:bg-white/10 hover:text-white"
                     >
                         <Bell className="h-5 w-5" />
 
-                        <span className="absolute right-2 top-2 h-2 w-2 rounded-full bg-blue-600 ring-2 ring-[#f7f8fa]" />
+                        <span className="absolute right-2 top-2 h-2 w-2 rounded-full bg-emerald-400 ring-2 ring-[#002b49]" />
                     </button>
 
                     {/* =================================================
@@ -194,24 +195,24 @@ export default function ParentLayout({
                             aria-expanded={
                                 isProfileMenuOpen
                             }
-                            className="hidden cursor-pointer items-center gap-2 rounded-lg px-2 py-1.5 transition hover:bg-slate-100 sm:flex"
+                            className="hidden cursor-pointer items-center gap-2 rounded-xl border border-white/10 bg-white/10 px-2.5 py-1.5 transition hover:bg-white/20 sm:flex"
                         >
-                            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-blue-100 text-blue-700">
+                            <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-[#0070ad] text-white font-bold text-xs">
                                 <User className="h-4 w-4" />
                             </div>
 
                             <div className="hidden text-left lg:block">
-                                <p className="max-w-[140px] truncate text-xs font-semibold text-slate-700">
+                                <p className="max-w-[140px] truncate text-xs font-bold text-white">
                                     {session?.user?.name ||
                                         "Parent"}
                                 </p>
 
-                                <p className="text-[10px] text-slate-500">
-                                    Parent
+                                <p className="text-[9px] font-semibold text-sky-200">
+                                    Guardian Account
                                 </p>
                             </div>
 
-                            <ChevronDown className="hidden h-4 w-4 text-slate-400 lg:block" />
+                            <ChevronDown className="hidden h-4 w-4 text-sky-300 lg:block" />
                         </button>
 
                         {isProfileMenuOpen && (
@@ -229,15 +230,15 @@ export default function ParentLayout({
                                 />
 
                                 {/* DROPDOWN */}
-                                <div className="absolute right-0 top-12 z-50 w-56 overflow-hidden rounded-xl border border-slate-200 bg-white shadow-xl">
+                                <div className="absolute right-0 top-12 z-50 w-56 overflow-hidden rounded-2xl border border-slate-200 bg-white text-slate-800 shadow-2xl">
                                     {/* USER INFORMATION */}
-                                    <div className="border-b border-slate-100 px-4 py-3">
-                                        <p className="truncate text-sm font-semibold text-slate-800">
+                                    <div className="border-b border-slate-100 bg-slate-50 px-4 py-3">
+                                        <p className="truncate text-sm font-extrabold text-slate-900">
                                             {session?.user?.name ||
                                                 "Parent"}
                                         </p>
 
-                                        <p className="truncate text-xs text-slate-500">
+                                        <p className="truncate text-xs text-slate-500 font-medium">
                                             {session?.user?.email ||
                                                 ""}
                                         </p>
@@ -252,12 +253,12 @@ export default function ParentLayout({
                                                     false
                                                 )
                                             }
-                                            className="flex cursor-pointer items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-slate-600 transition hover:bg-slate-100 hover:text-blue-600"
+                                            className="flex cursor-pointer items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-semibold text-slate-700 transition hover:bg-sky-50 hover:text-[#0070ad]"
                                         >
-                                            <User className="h-4 w-4" />
+                                            <User className="h-4 w-4 text-[#0070ad]" />
 
                                             <span>
-                                                Profile
+                                                Profile Settings
                                             </span>
                                         </Link>
 
@@ -269,12 +270,12 @@ export default function ParentLayout({
                                                     false
                                                 )
                                             }
-                                            className="flex cursor-pointer items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-slate-600 transition hover:bg-slate-100 hover:text-blue-600"
+                                            className="flex cursor-pointer items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-semibold text-slate-700 transition hover:bg-sky-50 hover:text-[#0070ad]"
                                         >
-                                            <Settings className="h-4 w-4" />
+                                            <Settings className="h-4 w-4 text-[#0070ad]" />
 
                                             <span>
-                                                Settings
+                                                Account Settings
                                             </span>
                                         </Link>
 
@@ -286,7 +287,7 @@ export default function ParentLayout({
                                             onClick={
                                                 handleLogout
                                             }
-                                            className="flex w-full cursor-pointer items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-slate-600 transition hover:bg-red-50 hover:text-red-600"
+                                            className="flex w-full cursor-pointer items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-semibold text-red-600 transition hover:bg-red-50"
                                         >
                                             <LogOut className="h-4 w-4" />
 
@@ -310,27 +311,27 @@ export default function ParentLayout({
                     type="button"
                     aria-label="Close navigation menu"
                     onClick={closeSidebar}
-                    className="fixed inset-0 z-40 cursor-default bg-slate-900/40 backdrop-blur-[1px]"
+                    className="fixed inset-0 z-40 cursor-default bg-slate-950/60 backdrop-blur-sm"
                 />
             )}
 
             {/* =========================================================
-                SLIDE-IN SIDEBAR
+                SLIDE-IN SIDEBAR (NETACAD STYLING)
             ========================================================= */}
             <aside
-                className={`fixed left-0 top-0 z-50 flex h-screen w-72 flex-col border-r border-slate-200 bg-[#f7f8fa] shadow-2xl transition-transform duration-300 ease-in-out ${isSidebarOpen
-                        ? "translate-x-0"
-                        : "-translate-x-full"
+                className={`fixed left-0 top-0 z-50 flex h-screen w-72 flex-col border-r border-slate-200 bg-white shadow-2xl transition-transform duration-300 ease-in-out ${isSidebarOpen
+                    ? "translate-x-0"
+                    : "-translate-x-full"
                     }`}
             >
                 {/* SIDEBAR HEADER */}
-                <div className="flex h-16 items-center justify-between border-b border-slate-200 px-4">
+                <div className="flex h-16 items-center justify-between border-b border-sky-950 bg-[#002b49] px-4 text-white">
                     <Link
                         href="/parent"
                         onClick={closeSidebar}
                         className="flex items-center gap-3"
                     >
-                        <div className="flex h-9 w-9 items-center justify-center overflow-hidden rounded-lg bg-white">
+                        <div className="flex h-9 w-9 items-center justify-center overflow-hidden rounded-xl bg-white/10 p-1 border border-white/20">
                             <img
                                 src="/learnbridge.png"
                                 alt="LearnBridge"
@@ -339,11 +340,11 @@ export default function ParentLayout({
                         </div>
 
                         <div>
-                            <p className="text-sm font-bold text-slate-800">
-                                LearnBridge
+                            <p className="text-sm font-extrabold tracking-tight text-white">
+                                Learn<span className="text-sky-400">Bridge</span>
                             </p>
 
-                            <p className="text-[10px] font-medium uppercase tracking-wide text-slate-500">
+                            <p className="text-[9px] font-semibold uppercase tracking-widest text-sky-200">
                                 Parent Portal
                             </p>
                         </div>
@@ -354,19 +355,19 @@ export default function ParentLayout({
                         type="button"
                         onClick={closeSidebar}
                         aria-label="Close navigation menu"
-                        className="flex h-9 w-9 cursor-pointer items-center justify-center rounded-lg text-slate-500 transition hover:bg-slate-200 hover:text-slate-800"
+                        className="flex h-8 w-8 cursor-pointer items-center justify-center rounded-lg bg-white/10 text-white transition hover:bg-white/20"
                     >
-                        <X className="h-5 w-5" />
+                        <X className="h-4 w-4" />
                     </button>
                 </div>
 
                 {/* =====================================================
-                    NAVIGATION
+                    NAVIGATION (NETACAD ACTIVE ACCENTS)
                 ===================================================== */}
                 <div className="flex-1 overflow-y-auto px-3 py-5">
                     <div>
-                        <p className="mb-2 px-3 text-[10px] font-bold uppercase tracking-wider text-slate-400">
-                            Learning
+                        <p className="mb-3 px-3 text-[10px] font-extrabold uppercase tracking-widest text-[#0070ad]">
+                            Parent Supervision
                         </p>
 
                         <nav className="space-y-1">
@@ -392,15 +393,15 @@ export default function ParentLayout({
                                         onClick={
                                             closeSidebar
                                         }
-                                        className={`group flex cursor-pointer items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition ${isActive
-                                                ? "bg-blue-600 text-white shadow-sm"
-                                                : "text-slate-600 hover:bg-slate-200 hover:text-slate-900"
+                                        className={`group flex cursor-pointer items-center gap-3 rounded-xl px-3.5 py-2.5 text-xs font-bold transition-all ${isActive
+                                            ? "bg-[#0070ad] text-white shadow-md font-extrabold"
+                                            : "text-slate-700 hover:bg-sky-50 hover:text-[#0070ad]"
                                             }`}
                                     >
                                         <Icon
                                             className={`h-[18px] w-[18px] shrink-0 ${isActive
-                                                    ? "text-white"
-                                                    : "text-slate-500 group-hover:text-blue-600"
+                                                ? "text-white"
+                                                : "text-slate-500 group-hover:text-[#0070ad]"
                                                 }`}
                                         />
 

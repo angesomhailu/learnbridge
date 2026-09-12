@@ -1,6 +1,18 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import {
+    CheckCircle2,
+    XCircle,
+    RotateCcw,
+    GraduationCap,
+    BookOpen,
+    FileText,
+    ExternalLink,
+    AlertCircle,
+    UserCheck,
+    Clock,
+} from "lucide-react";
 
 type Tutor = {
     id: string;
@@ -44,38 +56,24 @@ type Tutor = {
 };
 
 export default function AdminTutorsPage() {
-    const [tutors, setTutors] =
-        useState<Tutor[]>([]);
-
-    const [loading, setLoading] =
-        useState(true);
-
-    const [message, setMessage] =
-        useState("");
+    const [tutors, setTutors] = useState<Tutor[]>([]);
+    const [loading, setLoading] = useState(true);
+    const [message, setMessage] = useState("");
 
     async function loadTutors() {
         try {
-            const response = await fetch(
-                "/api/admin/tutors/pending"
-            );
-
+            const response = await fetch("/api/admin/tutors/pending");
             const data = await response.json();
 
             if (!response.ok) {
-                setMessage(
-                    data.message ||
-                    "Failed to load tutors."
-                );
+                setMessage(data.message || "Failed to load tutors.");
                 return;
             }
 
             setTutors(data.tutors || []);
         } catch (error) {
             console.error(error);
-
-            setMessage(
-                "Failed to load pending tutors."
-            );
+            setMessage("Failed to load pending tutors.");
         } finally {
             setLoading(false);
         }
@@ -85,266 +83,259 @@ export default function AdminTutorsPage() {
         loadTutors();
     }, []);
 
-    async function updateVerification(
-        tutorId: string,
-        verificationStatus: string
-    ) {
+    async function updateVerification(tutorId: string, verificationStatus: string) {
         try {
-            const response = await fetch(
-                `/api/admin/tutors/${tutorId}/verification`,
-                {
-                    method: "PATCH",
-
-                    headers: {
-                        "Content-Type":
-                            "application/json",
-                    },
-
-                    body: JSON.stringify({
-                        verificationStatus,
-                    }),
-                }
-            );
+            const response = await fetch(`/api/admin/tutors/${tutorId}/verification`, {
+                method: "PATCH",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    verificationStatus,
+                }),
+            });
 
             const data = await response.json();
 
             if (!response.ok) {
-                setMessage(
-                    data.message ||
-                    "Failed to update tutor."
-                );
-
+                setMessage(data.message || "Failed to update tutor.");
                 return;
             }
 
             setMessage(data.message);
-
             await loadTutors();
         } catch (error) {
             console.error(error);
-
-            setMessage(
-                "Something went wrong."
-            );
+            setMessage("Something went wrong.");
         }
     }
 
     if (loading) {
         return (
-            <main className="p-6">
-                Loading tutors...
-            </main>
+            <div className="flex items-center justify-center min-h-[300px] text-slate-500 text-sm font-semibold">
+                <div className="flex items-center gap-2">
+                    <Clock className="h-5 w-5 animate-spin text-blue-600" />
+                    <span>Loading tutor verification queue...</span>
+                </div>
+            </div>
         );
     }
 
     return (
-        <main className="min-h-screen p-6">
-            <div className="mx-auto max-w-6xl">
-                <h1 className="text-3xl font-bold">
-                    Tutor Verification
+        <div className="max-w-6xl mx-auto space-y-8">
+            {/* Header */}
+            <div className="rounded-3xl bg-white p-6 sm:p-8 border border-slate-200 shadow-sm space-y-2">
+                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-rose-50 border border-rose-200 text-rose-700 text-xs font-bold uppercase tracking-wider">
+                    <UserCheck className="h-3.5 w-3.5 text-rose-600" />
+                    Credential Auditing
+                </div>
+                <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
+                    Tutor Approvals Console
                 </h1>
-
-                <p className="mt-2 text-gray-600">
-                    Review tutor profiles and submitted
-                    credentials.
+                <p className="text-sm text-slate-600 max-w-2xl leading-relaxed">
+                    Review educator profiles, submitted degree records, subject proficiencies, and official credentials before issuing verified tutor badges on LearnBridge.
                 </p>
+            </div>
 
-                {message && (
-                    <div className="mt-6 rounded-lg border p-4">
+            {message && (
+                <div className="rounded-2xl border border-blue-200 bg-blue-50 p-4 text-xs font-semibold text-blue-800 shadow-xs flex items-center justify-between">
+                    <span className="flex items-center gap-2">
+                        <AlertCircle className="h-4 w-4 text-blue-600" />
                         {message}
+                    </span>
+                    <button
+                        onClick={() => setMessage("")}
+                        className="text-xs text-blue-600 hover:text-blue-800 font-bold"
+                    >
+                        Dismiss
+                    </button>
+                </div>
+            )}
+
+            {tutors.length === 0 ? (
+                <div className="rounded-3xl border border-slate-200 bg-white p-12 text-center space-y-3 shadow-sm">
+                    <div className="mx-auto h-12 w-12 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center">
+                        <CheckCircle2 className="h-6 w-6" />
                     </div>
-                )}
-
-                {tutors.length === 0 ? (
-                    <div className="mt-8 rounded-xl border p-8 text-center">
-                        <h2 className="text-xl font-semibold">
-                            No pending tutors
-                        </h2>
-
-                        <p className="mt-2 text-gray-600">
-                            All tutors have been reviewed.
-                        </p>
-                    </div>
-                ) : (
-                    <div className="mt-8 space-y-6">
-                        {tutors.map((tutor) => (
-                            <div
-                                key={tutor.id}
-                                className="rounded-xl border p-6"
-                            >
-                                <div className="flex flex-col justify-between gap-4 md:flex-row">
-                                    <div>
-                                        <h2 className="text-xl font-bold">
-                                            {tutor.user.email}
-                                        </h2>
-
-                                        <p className="mt-1 text-sm text-gray-500">
-                                            Status:{" "}
-                                            {tutor.verificationStatus}
-                                        </p>
-                                    </div>
-
-                                    <div className="flex gap-2">
-                                        <button
-                                            type="button"
-                                            onClick={() =>
-                                                updateVerification(
-                                                    tutor.id,
-                                                    "VERIFIED"
-                                                )
-                                            }
-                                            className="rounded-lg bg-green-600 px-4 py-2 text-white"
-                                        >
-                                            Approve
-                                        </button>
-
-                                        <button
-                                            type="button"
-                                            onClick={() =>
-                                                updateVerification(
-                                                    tutor.id,
-                                                    "REJECTED"
-                                                )
-                                            }
-                                            className="rounded-lg bg-red-600 px-4 py-2 text-white"
-                                        >
-                                            Reject
-                                        </button>
-
-                                        <button
-                                            type="button"
-                                            onClick={() =>
-                                                updateVerification(
-                                                    tutor.id,
-                                                    "RESUBMISSION_REQUIRED"
-                                                )
-                                            }
-                                            className="rounded-lg border px-4 py-2"
-                                        >
-                                            Request Resubmission
-                                        </button>
+                    <h2 className="text-xl font-bold text-slate-800">
+                        All Tutors Reviewed
+                    </h2>
+                    <p className="text-sm text-slate-500 max-w-md mx-auto">
+                        There are no pending educator profiles awaiting credential verification right now.
+                    </p>
+                </div>
+            ) : (
+                <div className="space-y-6">
+                    {tutors.map((tutor) => (
+                        <div
+                            key={tutor.id}
+                            className="rounded-3xl border border-slate-200 bg-white p-6 sm:p-8 shadow-sm space-y-6"
+                        >
+                            {/* Card Top Info & Quick Actions */}
+                            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 pb-6">
+                                <div className="space-y-1">
+                                    <div className="flex items-center gap-3">
+                                        <div className="h-10 w-10 rounded-full bg-slate-100 border border-slate-200 flex items-center justify-center font-bold text-slate-700 text-sm">
+                                            {tutor.user.email[0]?.toUpperCase() || "T"}
+                                        </div>
+                                        <div>
+                                            <h2 className="text-lg font-bold text-slate-900">
+                                                {tutor.user.email}
+                                            </h2>
+                                            <p className="text-xs text-slate-500">
+                                                Submitted: {new Date(tutor.user.createdAt).toLocaleDateString()}
+                                            </p>
+                                        </div>
                                     </div>
                                 </div>
 
-                                {tutor.bio && (
-                                    <div className="mt-6">
-                                        <h3 className="font-semibold">
-                                            Bio
-                                        </h3>
+                                <div className="flex flex-wrap items-center gap-2">
+                                    <button
+                                        type="button"
+                                        onClick={() => updateVerification(tutor.id, "VERIFIED")}
+                                        className="flex items-center gap-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs px-4 py-2.5 shadow-sm transition"
+                                    >
+                                        <CheckCircle2 className="h-4 w-4" />
+                                        <span>Approve</span>
+                                    </button>
 
-                                        <p className="mt-1 text-gray-600">
-                                            {tutor.bio}
-                                        </p>
-                                    </div>
-                                )}
+                                    <button
+                                        type="button"
+                                        onClick={() => updateVerification(tutor.id, "REJECTED")}
+                                        className="flex items-center gap-1.5 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs px-4 py-2.5 shadow-sm transition"
+                                    >
+                                        <XCircle className="h-4 w-4" />
+                                        <span>Reject</span>
+                                    </button>
 
-                                <div className="mt-6">
-                                    <h3 className="font-semibold">
-                                        Education
+                                    <button
+                                        type="button"
+                                        onClick={() => updateVerification(tutor.id, "RESUBMISSION_REQUIRED")}
+                                        className="flex items-center gap-1.5 rounded-xl border border-slate-300 bg-white hover:bg-slate-50 text-slate-700 font-bold text-xs px-4 py-2.5 transition"
+                                    >
+                                        <RotateCcw className="h-4 w-4 text-slate-500" />
+                                        <span>Request Resubmission</span>
+                                    </button>
+                                </div>
+                            </div>
+
+                            {/* Bio */}
+                            {tutor.bio && (
+                                <div className="space-y-1.5">
+                                    <h3 className="text-xs font-bold uppercase tracking-wider text-slate-400">
+                                        Biography & Statement
                                     </h3>
+                                    <p className="text-sm text-slate-700 leading-relaxed bg-slate-50 p-4 rounded-2xl border border-slate-200/60">
+                                        {tutor.bio}
+                                    </p>
+                                </div>
+                            )}
 
-                                    <div className="mt-2 space-y-2">
-                                        {tutor.educationRecords.map(
-                                            (education) => (
+                            {/* Two-Column Detail Grid */}
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                {/* Education Records */}
+                                <div className="space-y-3">
+                                    <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-slate-500">
+                                        <GraduationCap className="h-4 w-4 text-blue-600" />
+                                        Education Records
+                                    </div>
+                                    <div className="space-y-2">
+                                        {tutor.educationRecords.length === 0 ? (
+                                            <p className="text-xs text-slate-400 italic">No education records specified.</p>
+                                        ) : (
+                                            tutor.educationRecords.map((education) => (
                                                 <div
                                                     key={education.id}
-                                                    className="rounded-lg border p-3"
+                                                    className="rounded-2xl border border-slate-200 bg-slate-50/50 p-3.5 space-y-1"
                                                 >
-                                                    <p className="font-medium">
+                                                    <p className="font-bold text-xs text-slate-800">
                                                         {education.degree}
                                                     </p>
-
-                                                    <p className="text-sm text-gray-600">
-                                                        {
-                                                            education.institution
-                                                        }
-                                                        {education.department
-                                                            ? ` — ${education.department}`
-                                                            : ""}
+                                                    <p className="text-xs text-slate-600">
+                                                        {education.institution}
+                                                        {education.department ? ` — ${education.department}` : ""}
                                                     </p>
-
                                                     {education.graduationYear && (
-                                                        <p className="text-sm text-gray-500">
-                                                            Graduated:{" "}
-                                                            {
-                                                                education.graduationYear
-                                                            }
+                                                        <p className="text-[10px] text-slate-500 font-medium">
+                                                            Graduated: {education.graduationYear}
                                                         </p>
                                                     )}
                                                 </div>
-                                            )
+                                            ))
                                         )}
                                     </div>
                                 </div>
 
-                                <div className="mt-6">
-                                    <h3 className="font-semibold">
-                                        Subjects
-                                    </h3>
-
-                                    <div className="mt-2 flex flex-wrap gap-2">
-                                        {tutor.subjects.map(
-                                            (subject) => (
+                                {/* Subjects */}
+                                <div className="space-y-3">
+                                    <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-slate-500">
+                                        <BookOpen className="h-4 w-4 text-emerald-600" />
+                                        Subject Offerings
+                                    </div>
+                                    <div className="flex flex-wrap gap-2">
+                                        {tutor.subjects.length === 0 ? (
+                                            <p className="text-xs text-slate-400 italic">No subjects selected.</p>
+                                        ) : (
+                                            tutor.subjects.map((subject) => (
                                                 <span
                                                     key={subject.id}
-                                                    className="rounded-full border px-3 py-1 text-sm"
+                                                    className="inline-flex items-center gap-1.5 rounded-full border border-emerald-200 bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-800"
                                                 >
-                                                    {subject.subject.name}
+                                                    <span>{subject.subject.name}</span>
+                                                    {subject.proficiencyLevel && (
+                                                        <span className="text-[10px] font-bold text-emerald-600 bg-emerald-100 px-1.5 py-0.5 rounded-md">
+                                                            {subject.proficiencyLevel}
+                                                        </span>
+                                                    )}
                                                 </span>
-                                            )
-                                        )}
-                                    </div>
-                                </div>
-
-                                <div className="mt-6">
-                                    <h3 className="font-semibold">
-                                        Documents
-                                    </h3>
-
-                                    <div className="mt-2 space-y-2">
-                                        {tutor.documents.length ===
-                                            0 ? (
-                                            <p className="text-gray-500">
-                                                No documents submitted.
-                                            </p>
-                                        ) : (
-                                            tutor.documents.map(
-                                                (document) => (
-                                                    <div
-                                                        key={document.id}
-                                                        className="flex flex-col justify-between gap-3 rounded-lg border p-3 md:flex-row md:items-center"
-                                                    >
-                                                        <div>
-                                                            <p className="font-medium">
-                                                                {document.title}
-                                                            </p>
-
-                                                            <p className="text-sm text-gray-500">
-                                                                {document.type}
-                                                            </p>
-                                                        </div>
-
-                                                        <a
-                                                            href={
-                                                                document.fileUrl
-                                                            }
-                                                            target="_blank"
-                                                            rel="noopener noreferrer"
-                                                            className="rounded-lg border px-3 py-2 text-sm"
-                                                        >
-                                                            View Document
-                                                        </a>
-                                                    </div>
-                                                )
-                                            )
+                                            ))
                                         )}
                                     </div>
                                 </div>
                             </div>
-                        ))}
-                    </div>
-                )}
-            </div>
-        </main>
+
+                            {/* Documents Section */}
+                            <div className="space-y-3 pt-2 border-t border-slate-100">
+                                <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-slate-500">
+                                    <FileText className="h-4 w-4 text-indigo-600" />
+                                    Submitted Verification Documents
+                                </div>
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                    {tutor.documents.length === 0 ? (
+                                        <p className="text-xs text-slate-400 italic">No documents attached.</p>
+                                    ) : (
+                                        tutor.documents.map((document) => (
+                                            <div
+                                                key={document.id}
+                                                className="flex items-center justify-between gap-3 rounded-2xl border border-slate-200 bg-slate-50/50 p-3.5"
+                                            >
+                                                <div className="space-y-0.5 overflow-hidden">
+                                                    <p className="font-bold text-xs text-slate-800 truncate">
+                                                        {document.title}
+                                                    </p>
+                                                    <p className="text-[10px] uppercase font-semibold text-slate-500">
+                                                        {document.type}
+                                                    </p>
+                                                </div>
+
+                                                <a
+                                                    href={document.fileUrl}
+                                                    target="_blank"
+                                                    rel="noopener noreferrer"
+                                                    className="flex items-center gap-1 rounded-xl border border-blue-200 bg-blue-50 hover:bg-blue-100 text-blue-700 font-bold text-xs px-3 py-2 transition shrink-0"
+                                                >
+                                                    <span>View</span>
+                                                    <ExternalLink className="h-3.5 w-3.5" />
+                                                </a>
+                                            </div>
+                                        ))
+                                    )}
+                                </div>
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            )}
+        </div>
     );
 }

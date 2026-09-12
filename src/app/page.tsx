@@ -37,483 +37,367 @@ const features = [
 
 export default function HomePage() {
   return (
-    <main className="min-h-screen bg-[#dfe3e8] text-slate-900 font-sans relative overflow-hidden">
-      {/* Background decoration */}
-      <div className="absolute inset-0 pointer-events-none overflow-hidden">
-        <div className="absolute -top-40 -left-40 h-[500px] w-[500px] rounded-full bg-blue-200/20 blur-3xl" />
-        <div className="absolute top-[30%] -right-40 h-[550px] w-[550px] rounded-full bg-indigo-200/15 blur-3xl" />
-        <div className="absolute bottom-[-250px] left-[30%] h-[500px] w-[500px] rounded-full bg-blue-100/20 blur-3xl" />
-      </div>
-
-      {/* NAVBAR */}
-      <header className="sticky top-0 z-50 border-b border-slate-200 bg-[#f4f5f7] backdrop-blur">
-        <div className="mx-auto flex h-20 max-w-7xl items-center justify-between px-6 lg:px-8">
-          <Link href="/" className="flex items-center gap-3">
-            <Image
-              src="/learnbridge.png"
-              alt="LearnBridge"
-              width={46}
-              height={46}
-              className="h-11 w-11 object-contain"
-              priority
-            />
-
-            <div>
-              <div className="text-xl font-bold tracking-tight text-slate-900">
-                Learn<span className="text-blue-600">Bridge</span>
-              </div>
-              <div className="hidden text-[10px] font-medium uppercase tracking-[0.18em] text-slate-500 sm:block">
-                Learn better. Grow further.
-              </div>
-            </div>
-          </Link>
-
-          <nav className="hidden items-center gap-8 md:flex">
-            <a
-              href="#how-it-works"
-              className="text-sm font-medium text-slate-600 transition hover:text-blue-600"
-            >
-              How it works
-            </a>
-
-            <a
-              href="#features"
-              className="text-sm font-medium text-slate-600 transition hover:text-blue-600"
-            >
-              Features
-            </a>
-
-            <a
-              href="#safety"
-              className="text-sm font-medium text-slate-600 transition hover:text-blue-600"
-            >
-              Safety
-            </a>
-          </nav>
-
-          <div className="flex items-center gap-3">
-            <Link
-              href="/login"
-              className="hidden rounded-md px-4 py-2.5 text-sm font-semibold text-slate-700 transition hover:bg-slate-100 sm:block"
-            >
-              Sign in
-            </Link>
-
-            <Link
-              href="/register"
-              className="rounded-md bg-blue-600 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-blue-700"
-            >
-              Get Started
-            </Link>
-          </div>
-        </div>
-      </header>
-
-      {/* HERO */}
-      <section className="relative">
-        <div className="mx-auto grid max-w-7xl items-center gap-14 px-6 pb-20 pt-16 lg:grid-cols-2 lg:px-8 lg:pb-28 lg:pt-24">
-          {/* Left */}
-          <div className="relative z-10">
-
-            <h1 className="max-w-3xl text-4xl font-bold leading-tight tracking-tight text-slate-950 sm:text-5xl lg:text-6xl">
-              Find the right tutor.
-              <span className="block text-blue-600">
-                Learn with confidence.
-              </span>
-            </h1>
-
-            <p className="mt-6 max-w-2xl text-lg leading-8 text-slate-600">
-              LearnBridge helps students find tutors who fit their subjects,
-              learning goals, schedule, and budget — while giving parents and
-              learners greater confidence in the learning process.
-            </p>
-
-            <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-              <Link
-                href="/register"
-                className="inline-flex items-center justify-center rounded-md bg-blue-600 px-6 py-3.5 text-sm font-bold text-white shadow-sm transition hover:bg-blue-700"
-              >
-                Find a Tutor
-                <span className="ml-2">→</span>
-              </Link>
-
-              <a
-                href="#how-it-works"
-                className="inline-flex items-center justify-center rounded-md border border-slate-300 bg-white px-6 py-3.5 text-sm font-bold text-slate-700 transition hover:border-blue-300 hover:bg-blue-50 hover:text-blue-700"
-              >
-                See how it works
-              </a>
-            </div>
-
-            <div className="mt-9 flex flex-wrap gap-x-7 gap-y-3 text-sm text-slate-600">
-              <div className="flex items-center gap-2">
-                <span className="font-bold text-blue-600">✓</span>
-                Verified tutors
-              </div>
-
-              <div className="flex items-center gap-2">
-                <span className="font-bold text-blue-600">✓</span>
-                Smart matching
-              </div>
-
-              <div className="flex items-center gap-2">
-                <span className="font-bold text-blue-600">✓</span>
-                Parent controls
-              </div>
-            </div>
-          </div>
-
-          {/* Dashboard Preview */}
-          <div className="relative z-10">
-            <div className="rounded-2xl border border-slate-200 bg-white  shadow-[0_20px_60px_rgba(15,23,42,0.10)] sm:p-6">
-              {/* Fake browser/header */}
-
-              <div className="mb-6">
-                <p className="text-xs font-semibold uppercase tracking-wider text-slate-500">
-                  Student Dashboard
-                </p>
-
-                <h2 className="mt-1 text-2xl font-bold text-slate-900">
-                  Welcome back
-                </h2>
-
-                <p className="mt-1 text-sm text-slate-500">
-                  Here is a tutor match selected for your learning needs.
-                </p>
-              </div>
-
-              {/* Match card */}
-              <div className="rounded-xl border border-blue-100 bg-blue-50/60 p-5">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-xs font-bold uppercase tracking-wider text-blue-700">
-                      Your tutor match
-                    </p>
-
-                    <h3 className="mt-2 text-lg font-bold text-slate-900">
-                      Recommended Tutor
-                    </h3>
-                  </div>
-
-                  <span className="rounded-full bg-blue-600 px-3 py-1 text-[10px] font-bold uppercase tracking-wide text-white">
-                    Verified
-                  </span>
-                </div>
-
-                <div className="mt-5 flex items-center gap-4">
-                  <div className="flex h-14 w-14 items-center justify-center rounded-full bg-white text-xl font-bold text-blue-600 shadow-sm">
-                    T
-                  </div>
-
-                  <div>
-                    <p className="font-bold text-slate-900">
-                      Mathematics & Physics
-                    </p>
-
-                    <p className="mt-1 text-sm text-slate-500">
-                      Experienced tutor
-                    </p>
-                  </div>
-                </div>
-
-                <div className="mt-5 grid grid-cols-3 gap-3">
-                  <div className="rounded-lg bg-white p-3 text-center">
-                    <p className="text-lg font-bold text-blue-600">94%</p>
-                    <p className="text-[10px] font-medium uppercase text-slate-500">
-                      Match
-                    </p>
-                  </div>
-
-                  <div className="rounded-lg bg-white p-3 text-center">
-                    <p className="text-lg font-bold text-slate-900">4.9</p>
-                    <p className="text-[10px] font-medium uppercase text-slate-500">
-                      Rating
-                    </p>
-                  </div>
-
-                  <div className="rounded-lg bg-white p-3 text-center">
-                    <p className="text-lg font-bold text-slate-900">ETB</p>
-                    <p className="text-[10px] font-medium uppercase text-slate-500">
-                      Budget fit
-                    </p>
-                  </div>
-                </div>
-
-                <button className="mt-5 w-full rounded-lg bg-blue-600 px-4 py-3 text-sm font-bold text-white transition hover:bg-blue-700">
-                  View Tutor Match
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* PERSONAL LEARNING */}
-      <section className="border-y border-slate-200 bg-white">
-        <div className="mx-auto max-w-7xl px-6 py-20 lg:px-8">
-          <div className="grid gap-12 lg:grid-cols-[0.9fr_1.1fr] lg:items-center">
-            <div>
-              <p className="text-sm font-bold uppercase tracking-[0.18em] text-blue-600">
-                Learning is personal
-              </p>
-
-              <h2 className="mt-4 text-3xl font-bold tracking-tight text-slate-950 sm:text-4xl">
-                Your learning journey should work for you.
-              </h2>
-            </div>
-
-            <div>
-              <p className="text-lg leading-8 text-slate-600">
-                Every student learns differently. LearnBridge brings students,
-                parents, and tutors together through a platform designed around
-                individual learning needs.
-              </p>
-
-              <p className="mt-5 text-lg leading-8 text-slate-600">
-                Whether you need help with mathematics, physics, languages, or
-                another subject, you can discover tutors based on what matters
-                most to you.
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* HOW IT WORKS */}
-      <section id="how-it-works" className="scroll-mt-20 bg-[#eef1f5]">
-        <div className="mx-auto max-w-7xl px-6 py-20 lg:px-8">
-          <div className="max-w-2xl">
-            <p className="text-sm font-bold uppercase tracking-[0.18em] text-blue-600">
-              How it works
-            </p>
-
-            <h2 className="mt-3 text-3xl font-bold tracking-tight text-slate-950 sm:text-4xl">
-              A simpler way to find the right tutor.
-            </h2>
-
-            <p className="mt-4 text-lg leading-8 text-slate-600">
-              LearnBridge makes the process straightforward, from creating your
-              profile to finding a tutor who fits your needs.
-            </p>
-          </div>
-
-          <div className="mt-12 grid gap-6 md:grid-cols-3">
-            {[
-              {
-                number: "01",
-                title: "Tell us what you need",
-                text: "Create your learner profile and tell us about your subjects, goals, schedule, and preferred budget.",
-              },
-              {
-                number: "02",
-                title: "Discover your matches",
-                text: "Explore tutors who match your learning requirements and compare their profiles, ratings, and experience.",
-              },
-              {
-                number: "03",
-                title: "Start learning",
-                text: "Connect with your tutor, arrange sessions, communicate safely, and continue building your learning progress.",
-              },
-            ].map((step) => (
-              <div
-                key={step.number}
-                className="rounded-xl border border-slate-200 bg-white p-7 shadow-sm transition hover:-translate-y-1 hover:shadow-md"
-              >
-                <div className="flex h-11 w-11 items-center justify-center rounded-lg bg-blue-600 text-sm font-bold text-white">
-                  {step.number}
-                </div>
-
-                <h3 className="mt-6 text-xl font-bold text-slate-900">
-                  {step.title}
-                </h3>
-
-                <p className="mt-3 leading-7 text-slate-600">
-                  {step.text}
-                </p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* FEATURES */}
-      <section id="features" className="scroll-mt-20 bg-white">
-        <div className="mx-auto max-w-7xl px-6 py-20 lg:px-8">
-          <div className="text-center">
-            <p className="text-sm font-bold uppercase tracking-[0.18em] text-blue-600">
-              Why LearnBridge
-            </p>
-
-            <h2 className="mt-3 text-3xl font-bold tracking-tight text-slate-950 sm:text-4xl">
-              Built around better learning
-            </h2>
-
-            <p className="mx-auto mt-4 max-w-2xl text-lg leading-8 text-slate-600">
-              Everything you need to make tutoring more accessible, organized,
-              and personalized.
-            </p>
-          </div>
-
-          <div className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-            {features.map((feature) => (
-              <div
-                key={feature.title}
-                className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm transition hover:-translate-y-1 hover:border-blue-200 hover:shadow-md"
-              >
-                <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-blue-50 text-2xl">
-                  {feature.icon}
-                </div>
-
-                <h3 className="mt-5 text-lg font-bold text-slate-900">
-                  {feature.title}
-                </h3>
-
-                <p className="mt-2 leading-7 text-slate-600">
-                  {feature.text}
-                </p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* SAFETY */}
-      <section id="safety" className="scroll-mt-20 bg-[#eef1f5]">
-        <div className="mx-auto max-w-7xl px-6 py-20 lg:px-8">
-          <div className="overflow-hidden rounded-2xl border border-blue-100 bg-blue-50">
-            <div className="grid gap-10 p-8 md:grid-cols-[0.8fr_1.2fr] md:p-12">
-              <div>
-                <div className="flex h-14 w-14 items-center justify-center rounded-xl bg-blue-600 text-2xl text-white">
-                  🛡️
-                </div>
-
-                <p className="mt-6 text-sm font-bold uppercase tracking-[0.18em] text-blue-700">
-                  Safety first
-                </p>
-
-                <h2 className="mt-3 text-3xl font-bold tracking-tight text-slate-950">
-                  A learning environment built with trust in mind.
-                </h2>
-              </div>
-
-              <div>
-                <p className="text-lg leading-8 text-slate-700">
-                  LearnBridge is designed to help students, parents, and tutors
-                  interact with greater confidence.
-                </p>
-
-                <div className="mt-7 grid gap-4 sm:grid-cols-2">
-                  {[
-                    "Tutor verification",
-                    "Parent controls",
-                    "Secure communication",
-                    "Ratings and reviews",
-                  ].map((item) => (
-                    <div
-                      key={item}
-                      className="flex items-center gap-3 rounded-lg border border-blue-100 bg-white px-4 py-3"
-                    >
-                      <span className="font-bold text-blue-600">✓</span>
-                      <span className="text-sm font-semibold text-slate-700">
-                        {item}
-                      </span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* FINAL CTA */}
-      <section className="bg-blue-600">
-        <div className="mx-auto max-w-5xl px-6 py-20 text-center lg:px-8">
-          <h2 className="text-3xl font-bold tracking-tight text-white sm:text-4xl">
-            Ready to make learning more personal?
-          </h2>
-
-          <p className="mx-auto mt-5 max-w-2xl text-lg leading-8 text-blue-100">
-            Create your LearnBridge account and take the next step toward
-            finding the right learning support.
-          </p>
-
-          <div className="mt-8 flex flex-col justify-center gap-3 sm:flex-row">
-            <Link
-              href="/register"
-              className="rounded-md bg-white px-7 py-3.5 text-sm font-bold text-blue-700 shadow-sm transition hover:bg-blue-50"
-            >
-              Get Started
-            </Link>
-
-            <Link
-              href="/login"
-              className="rounded-md border border-blue-300 bg-blue-700 px-7 py-3.5 text-sm font-bold text-white transition hover:bg-blue-800"
-            >
-              Sign in
-            </Link>
-          </div>
-        </div>
-      </section>
-
-      {/* FOOTER */}
-      <footer className="border-t border-slate-200 bg-white">
-        <div className="mx-auto max-w-7xl px-6 py-6 lg:px-8">
-          <div className="flex flex-col gap-5 md:flex-row md:items-center md:justify-between">
-
-            {/* Logo + Brand */}
-            <div className="flex shrink-0 items-center gap-3">
+    <main className="min-h-screen bg-[#f0f4f8] text-slate-900 font-sans flex flex-col justify-between">
+      {/* ================= NETACAD TOP HEADER ================= */}
+      <header className="h-[72px] bg-[#002b49] border-b border-sky-950 text-white sticky top-0 z-50 shadow-md">
+        <div className="max-w-7xl mx-auto h-full px-5 sm:px-8 flex items-center justify-between">
+          {/* Logo & Platform Tag */}
+          <Link href="/" className="flex items-center gap-3 group">
+            <div className="relative h-10 w-10 overflow-hidden rounded-xl bg-white/10 p-1 border border-white/20 backdrop-blur-md">
               <Image
                 src="/learnbridge.png"
                 alt="LearnBridge"
                 width={40}
                 height={40}
-                className="h-10 w-10 object-contain"
+                className="h-full w-full object-contain"
+                priority
               />
+            </div>
 
-              <div>
-                <p className="font-bold text-slate-900">
-                  Learn<span className="text-blue-600">Bridge</span>
-                </p>
-
-                <p className="text-xs text-slate-500">
-                  Learn better. Grow further.
-                </p>
+            <div>
+              <div className="text-xl font-extrabold tracking-tight text-white flex items-center gap-1.5">
+                <span>Learn<span className="text-sky-400">Bridge</span></span>
+                <span className="hidden sm:inline-block text-[10px] uppercase font-bold tracking-widest bg-sky-500/20 text-sky-300 px-2 py-0.5 rounded-full border border-sky-400/30">
+                  Skills Academy
+                </span>
+              </div>
+              <div className="hidden text-[8px] font-semibold uppercase tracking-[0.2em] text-sky-200/70 sm:block">
+                Powered by Global Skills Standards
               </div>
             </div>
+          </Link>
 
-            {/* Links */}
-            <div className="flex items-center gap-6 text-sm text-slate-500">
-              <a
-                href="#"
-                className="transition hover:text-blue-600"
+          {/* Navigation links */}
+          <nav className="hidden items-center gap-8 md:flex text-xs font-bold uppercase tracking-wider text-sky-100/90">
+            <a href="#tracks" className="transition hover:text-sky-400">
+              Learning Tracks
+            </a>
+            <a href="#how-it-works" className="transition hover:text-sky-400">
+              How It Works
+            </a>
+            <a href="#features" className="transition hover:text-sky-400">
+              Features
+            </a>
+            <a href="#safety" className="transition hover:text-sky-400">
+              Safety & Trust
+            </a>
+          </nav>
+
+          {/* CTA Buttons */}
+          <div className="flex items-center gap-3">
+            <Link
+              href="/login"
+              className="text-xs font-bold text-sky-100 hover:text-white bg-white/10 hover:bg-white/20 px-4 py-2 rounded-xl transition border border-white/10"
+            >
+              Sign In
+            </Link>
+
+            <Link
+              href="/register"
+              className="text-xs font-bold text-white bg-[#0070ad] hover:bg-[#005073] px-5 py-2.5 rounded-xl shadow-md transition border border-sky-400/30 flex items-center gap-1.5"
+            >
+              <span>Get Started</span>
+              <span>→</span>
+            </Link>
+          </div>
+        </div>
+      </header>
+
+      {/* ================= NETACAD HERO SECTION ================= */}
+      <section className="bg-gradient-to-br from-[#002b49] via-[#004870] to-[#0070ad] text-white relative overflow-hidden py-16 lg:py-24">
+        {/* Background glowing tech graphics */}
+        <div className="absolute top-0 right-0 w-[600px] h-[600px] rounded-full bg-sky-400/10 blur-3xl pointer-events-none" />
+        <div className="absolute bottom-0 left-0 w-[500px] h-[500px] rounded-full bg-indigo-500/15 blur-3xl pointer-events-none" />
+
+        <div className="max-w-7xl mx-auto px-6 lg:px-8 relative z-10 grid lg:grid-cols-12 gap-12 items-center">
+          {/* Left Hero Content */}
+          <div className="lg:col-span-7 space-y-6">
+            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/10 backdrop-blur-md text-sky-300 text-xs font-bold uppercase tracking-wider border border-white/15">
+              <span>🚀</span> Skills for All • AI & Certified Educator Platform
+            </div>
+
+            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black tracking-tight text-white leading-[1.1]">
+              Accelerate Your Future With Certified Tutors.
+            </h1>
+
+            <p className="text-base sm:text-lg text-sky-100/90 max-w-2xl leading-relaxed">
+              Connect with expert educators matched precisely to your subject goals, Ethiopian curriculum standards, and budget. Built for students, parents, and certified tutors.
+            </p>
+
+            <div className="pt-2 flex flex-col sm:flex-row items-stretch sm:items-center gap-4">
+              <Link
+                href="/register"
+                className="h-13 px-8 rounded-xl bg-[#0070ad] hover:bg-[#005073] active:bg-[#003d59] text-white font-extrabold text-sm shadow-xl transition-all duration-200 border border-sky-400/40 flex items-center justify-center gap-2"
               >
-                Privacy
-              </a>
+                <span>Find Your Tutor Match</span>
+                <span className="text-lg">→</span>
+              </Link>
 
               <a
-                href="#"
-                className="transition hover:text-blue-600"
+                href="#tracks"
+                className="h-13 px-8 rounded-xl bg-white/10 hover:bg-white/20 active:bg-white/30 text-white font-bold text-sm backdrop-blur-md border border-white/20 transition flex items-center justify-center gap-2"
               >
-                Terms
-              </a>
-
-              <a
-                href="#"
-                className="transition hover:text-blue-600"
-              >
-                Support
+                <span>Explore Learning Tracks</span>
               </a>
             </div>
 
-            {/* Copyright */}
-            <div className="shrink-0 text-xs text-slate-500">
-              © {new Date().getFullYear()} LearnBridge. All rights reserved.
+            {/* Quick Stats Ticker */}
+            <div className="pt-8 border-t border-white/15 grid grid-cols-3 gap-4">
+              <div>
+                <div className="text-2xl sm:text-3xl font-black text-white">2,500+</div>
+                <div className="text-xs font-semibold text-sky-200/80 uppercase tracking-wider">Verified Tutors</div>
+              </div>
+              <div>
+                <div className="text-2xl sm:text-3xl font-black text-sky-300">98.4%</div>
+                <div className="text-xs font-semibold text-sky-200/80 uppercase tracking-wider">Match Accuracy</div>
+              </div>
+              <div>
+                <div className="text-2xl sm:text-3xl font-black text-white">50+</div>
+                <div className="text-xs font-semibold text-sky-200/80 uppercase tracking-wider">Subjects & Tracks</div>
+              </div>
+            </div>
+          </div>
+
+          {/* Right NetAcad Hero Match Card Preview */}
+          <div className="lg:col-span-5">
+            <div className="rounded-3xl bg-white/10 backdrop-blur-xl border border-white/20 p-6 sm:p-8 shadow-2xl space-y-6">
+              <div className="flex items-center justify-between border-b border-white/15 pb-4">
+                <div className="flex items-center gap-2.5">
+                  <div className="h-3 w-3 rounded-full bg-emerald-400 animate-pulse" />
+                  <span className="text-xs font-extrabold uppercase tracking-wider text-sky-200">
+                    Live Smart Matcher
+                  </span>
+                </div>
+                <span className="px-3 py-1 rounded-full bg-sky-500/20 text-sky-300 text-[10px] font-bold uppercase tracking-wider border border-sky-400/30">
+                  AI Active
+                </span>
+              </div>
+
+              {/* Tutor Feature Card */}
+              <div className="rounded-2xl bg-white text-slate-900 p-6 shadow-xl space-y-4">
+                <div className="flex items-start justify-between">
+                  <div className="flex items-center gap-3.5">
+                    <div className="h-12 w-12 rounded-xl bg-[#002b49] text-white flex items-center justify-center font-black text-xl">
+                      M
+                    </div>
+                    <div>
+                      <h3 className="font-extrabold text-slate-900 text-base">Dr. Meron Tadesse</h3>
+                      <p className="text-xs text-slate-500 font-medium">Senior Mathematics & Physics Tutor</p>
+                    </div>
+                  </div>
+                  <span className="px-2.5 py-1 rounded-lg bg-emerald-100 text-emerald-800 text-[11px] font-bold">
+                    ✓ Verified
+                  </span>
+                </div>
+
+                <div className="grid grid-cols-3 gap-2 bg-slate-50 p-3 rounded-xl border border-slate-100 text-center">
+                  <div>
+                    <p className="text-xs text-slate-500 uppercase font-bold">Match</p>
+                    <p className="text-base font-black text-[#0070ad]">96%</p>
+                  </div>
+                  <div>
+                    <p className="text-xs text-slate-500 uppercase font-bold">Rating</p>
+                    <p className="text-base font-black text-amber-500">4.95 ★</p>
+                  </div>
+                  <div>
+                    <p className="text-xs text-slate-500 uppercase font-bold">Hourly</p>
+                    <p className="text-base font-black text-slate-800">ETB 350</p>
+                  </div>
+                </div>
+
+                <Link
+                  href="/register"
+                  className="w-full h-10 rounded-xl bg-[#0070ad] hover:bg-[#005073] text-white text-xs font-bold flex items-center justify-center transition"
+                >
+                  Book Session with Match →
+                </Link>
+              </div>
             </div>
           </div>
         </div>
-      </footer>
+      </section>
 
+      {/* ================= FEATURED LEARNING TRACKS ================= */}
+      <section id="tracks" className="py-20 bg-white">
+        <div className="max-w-7xl mx-auto px-6 lg:px-8 space-y-12">
+          <div className="text-center max-w-3xl mx-auto space-y-3">
+            <div className="text-xs font-extrabold uppercase tracking-widest text-[#0070ad]">
+              NetAcad Curriculum Tracks
+            </div>
+            <h2 className="text-3xl sm:text-4xl font-black text-slate-900 tracking-tight">
+              Explore Popular Academic & Skill Domains
+            </h2>
+            <p className="text-slate-600 text-sm sm:text-base">
+              Choose from structured learning tracks supported by verified Ethiopian tutors.
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {[
+              {
+                icon: "📐",
+                title: "STEM & Mathematics",
+                level: "Grade 7 - University",
+                tutors: "120+ Tutors",
+                desc: "Algebra, Calculus, Physics, and Chemistry structured for national exam success.",
+                tag: "High Demand",
+              },
+              {
+                icon: "💻",
+                title: "Computer & Software",
+                level: "Beginner to Advanced",
+                tutors: "85+ Tutors",
+                desc: "Python programming, web development, robotics, and digital literacy.",
+                tag: "Tech Track",
+              },
+              {
+                icon: "🗣️",
+                title: "Languages & Communication",
+                level: "All Levels",
+                tutors: "95+ Tutors",
+                desc: "English fluency, Amharic grammar, Afaan Oromoo, and academic writing.",
+                tag: "Core Skill",
+              },
+              {
+                icon: "📝",
+                title: "Grade 8 & 12 National Exams",
+                level: "Exam Prep",
+                tutors: "150+ Tutors",
+                desc: "Targeted exam revision, practice tests, and timed mock assessments.",
+                tag: "Exam Focused",
+              },
+            ].map((track, i) => (
+              <div
+                key={i}
+                className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm hover:shadow-xl transition-all duration-300 hover:-translate-y-1 flex flex-col justify-between space-y-5 border-t-4 border-t-[#0070ad]"
+              >
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between">
+                    <span className="text-3xl">{track.icon}</span>
+                    <span className="px-2.5 py-0.5 rounded-full bg-sky-50 text-[#0070ad] text-[10px] font-extrabold uppercase tracking-wider border border-sky-200">
+                      {track.tag}
+                    </span>
+                  </div>
+
+                  <h3 className="text-lg font-extrabold text-slate-900">{track.title}</h3>
+                  <p className="text-xs text-slate-600 leading-relaxed">{track.desc}</p>
+                </div>
+
+                <div className="pt-4 border-t border-slate-100 flex items-center justify-between text-xs font-semibold text-slate-500">
+                  <span>{track.level}</span>
+                  <span className="font-bold text-[#0070ad]">{track.tutors}</span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ================= HOW IT WORKS (NETACAD STEPS) ================= */}
+      <section id="how-it-works" className="py-20 bg-[#f0f4f8] border-y border-slate-200">
+        <div className="max-w-7xl mx-auto px-6 lg:px-8 space-y-12">
+          <div className="text-center max-w-2xl mx-auto space-y-3">
+            <div className="text-xs font-extrabold uppercase tracking-widest text-[#0070ad]">
+              Structured Learning Flow
+            </div>
+            <h2 className="text-3xl sm:text-4xl font-black text-slate-900 tracking-tight">
+              Three Steps to Learning Success
+            </h2>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-8">
+            {[
+              {
+                step: "01",
+                title: "Define Your Goal",
+                text: "Select your role (Student or Parent), pick your target subjects, grade level, schedule, and hourly budget.",
+              },
+              {
+                step: "02",
+                title: "Review AI Matches",
+                text: "Compare verified tutor credentials, national exam experience, parent reviews, and schedule availability.",
+              },
+              {
+                step: "03",
+                title: "Start & Track Progress",
+                text: "Book sessions securely, track learning milestones, and receive regular parent progress updates.",
+              },
+            ].map((step, idx) => (
+              <div
+                key={idx}
+                className="rounded-3xl bg-white border border-slate-200 p-8 shadow-md relative overflow-hidden space-y-4"
+              >
+                <div className="text-4xl font-black text-slate-200 absolute top-4 right-6 pointer-events-none">
+                  {step.step}
+                </div>
+
+                <div className="h-12 w-12 rounded-2xl bg-[#002b49] text-white flex items-center justify-center font-bold text-lg">
+                  {step.step}
+                </div>
+
+                <h3 className="text-xl font-extrabold text-slate-900">{step.title}</h3>
+                <p className="text-sm text-slate-600 leading-relaxed">{step.text}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ================= FEATURES & TRUST ================= */}
+      <section id="features" className="py-20 bg-white">
+        <div className="max-w-7xl mx-auto px-6 lg:px-8 space-y-12">
+          <div className="text-center max-w-2xl mx-auto space-y-3">
+            <div className="text-xs font-extrabold uppercase tracking-widest text-[#0070ad]">
+              Platform Capabilities
+            </div>
+            <h2 className="text-3xl sm:text-4xl font-black text-slate-900 tracking-tight">
+              Designed for Excellence & Safety
+            </h2>
+          </div>
+
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {features.map((feature, i) => (
+              <div
+                key={i}
+                className="rounded-2xl border border-slate-200 bg-slate-50/50 p-6 space-y-3 hover:bg-white hover:shadow-lg hover:border-sky-300 transition"
+              >
+                <div className="text-3xl">{feature.icon}</div>
+                <h3 className="text-base font-extrabold text-slate-900">{feature.title}</h3>
+                <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">{feature.text}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ================= NETACAD FOOTER ================= */}
+      <footer className="bg-[#002b49] text-white py-12 border-t border-sky-950">
+        <div className="max-w-7xl mx-auto px-6 lg:px-8 space-y-8">
+          <div className="flex flex-col md:flex-row items-center justify-between gap-6 pb-8 border-b border-white/10">
+            <div className="flex items-center gap-3">
+              <div className="h-10 w-10 rounded-xl bg-white/10 p-1 border border-white/20 flex items-center justify-center">
+                <Image src="/learnbridge.png" alt="LearnBridge" width={32} height={32} className="object-contain" />
+              </div>
+              <div>
+                <span className="text-lg font-extrabold text-white">Learn<span className="text-sky-400">Bridge</span></span>
+                <p className="text-xs text-sky-200/70">Connecting Learners, Parents, and Tutors</p>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-6 text-xs font-bold text-sky-200">
+              <Link href="/login" className="hover:text-white transition">Sign In</Link>
+              <Link href="/register" className="hover:text-white transition">Register</Link>
+              <a href="#tracks" className="hover:text-white transition">Learning Tracks</a>
+              <a href="#safety" className="hover:text-white transition">Safety</a>
+            </div>
+          </div>
+
+          <div className="flex flex-col sm:flex-row items-center justify-between text-xs text-sky-200/60 gap-4">
+            <p>&copy; {new Date().getFullYear()} LearnBridge Skills Academy. All rights reserved.</p>
+            <p>Inspired by modern Skills for All design standards.</p>
+          </div>
+        </div>
+      </footer>
     </main>
   );
 }
