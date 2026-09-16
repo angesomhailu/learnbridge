@@ -25,8 +25,15 @@ export async function GET() {
             tutorRejectedCount,
             tutorResubmitCount,
             totalBookings,
+            pendingBookings,
+            confirmedBookings,
+            completedBookings,
+            cancelledBookings,
             totalSubjects,
+            openReportsCount,
+            totalPaymentsResult,
             recentUsers,
+            recentAuditLogs,
         ] = await Promise.all([
             prisma.user.count(),
             prisma.user.count({ where: { role: "STUDENT" } }),
@@ -38,7 +45,16 @@ export async function GET() {
             prisma.tutorProfile.count({ where: { verificationStatus: "REJECTED" } }),
             prisma.tutorProfile.count({ where: { verificationStatus: "RESUBMISSION_REQUIRED" } }),
             prisma.booking.count(),
+            prisma.booking.count({ where: { status: "PENDING" } }),
+            prisma.booking.count({ where: { status: "CONFIRMED" } }),
+            prisma.booking.count({ where: { status: "COMPLETED" } }),
+            prisma.booking.count({ where: { status: "CANCELLED" } }),
             prisma.subject.count(),
+            prisma.report.count({ where: { status: { in: ["OPEN", "UNDER_REVIEW"] } } }),
+            prisma.payment.aggregate({
+                _sum: { amount: true },
+                where: { status: "PAID" },
+            }),
             prisma.user.findMany({
                 take: 6,
                 orderBy: { createdAt: "desc" },
@@ -50,7 +66,22 @@ export async function GET() {
                     createdAt: true,
                 },
             }),
+            prisma.auditLog.findMany({
+                take: 6,
+                orderBy: { createdAt: "desc" },
+                include: {
+                    actor: {
+                        select: {
+                            id: true,
+                            email: true,
+                            role: true,
+                        },
+                    },
+                },
+            }),
         ]);
+
+        const totalRevenue = Number(totalPaymentsResult._sum.amount || 0);
 
         return NextResponse.json({
             stats: {
@@ -68,10 +99,19 @@ export async function GET() {
                     rejected: tutorRejectedCount,
                     resubmit: tutorResubmitCount,
                 },
-                totalBookings,
+                bookings: {
+                    total: totalBookings,
+                    pending: pendingBookings,
+                    confirmed: confirmedBookings,
+                    completed: completedBookings,
+                    cancelled: cancelledBookings,
+                },
                 totalSubjects,
+                openReportsCount,
+                totalRevenue,
             },
             recentUsers,
+            recentAuditLogs,
         });
     } catch (error) {
         console.error("Admin stats fetch error:", error);
