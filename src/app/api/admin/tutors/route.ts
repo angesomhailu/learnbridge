@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
-import { VerificationStatus } from "@prisma/client";
+import { VerificationStatus } from "@/generated/prisma/client";
 
 export async function GET(request: Request) {
     try {
