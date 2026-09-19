@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { ClipboardList, CheckCircle2, Clock, XCircle, MessageSquare, CalendarPlus, ShieldAlert } from "lucide-react";
+import { ClipboardList, CheckCircle2, Clock, XCircle, MessageSquare, CalendarPlus, ShieldAlert, Plus } from "lucide-react";
 
 type RequestItem = {
     id: string;
@@ -79,7 +79,7 @@ export default function StudentRequestsPage() {
                 <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
                     <div>
                         <h1 className="text-2xl md:text-3xl font-bold text-slate-900 flex items-center gap-3">
-                            <ClipboardList className="h-8 w-8 text-blue-600" />
+                            <ClipboardList className="h-8 w-8 text-[#0070ad]" />
                             My Tutor Requests
                         </h1>
                         <p className="mt-1 text-sm text-slate-500">
@@ -89,9 +89,10 @@ export default function StudentRequestsPage() {
 
                     <Link
                         href="/student/tutors"
-                        className="inline-flex items-center gap-2 rounded-xl bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-blue-700 transition"
+                        className="inline-flex items-center gap-2 rounded-xl bg-[#0070ad] px-4 py-2.5 text-xs font-bold text-white shadow-sm hover:bg-sky-700 transition"
                     >
-                        + Request New Tutor
+                        <Plus className="h-4 w-4" />
+                        Request New Tutor
                     </Link>
                 </div>
 
@@ -114,8 +115,8 @@ export default function StudentRequestsPage() {
                             key={tab}
                             onClick={() => setFilter(tab)}
                             className={`px-4 py-2 text-xs font-semibold rounded-lg transition ${filter === tab
-                                    ? "bg-slate-900 text-white shadow-sm"
-                                    : "text-slate-600 hover:bg-slate-200/60"
+                                ? "bg-[#002b49] text-white shadow-sm"
+                                : "text-slate-600 hover:bg-slate-200/60"
                                 }`}
                         >
                             {tab === "ALL" ? `All Requests (${requests.length})` : `${tab} (${requests.filter(r => r.status === tab).length})`}
@@ -132,7 +133,7 @@ export default function StudentRequestsPage() {
                 {/* Content */}
                 {loading ? (
                     <div className="flex justify-center items-center py-16">
-                        <div className="h-8 w-8 animate-spin rounded-full border-4 border-blue-600 border-t-transparent"></div>
+                        <div className="h-8 w-8 animate-spin rounded-full border-4 border-[#0070ad] border-t-transparent"></div>
                     </div>
                 ) : filteredRequests.length === 0 ? (
                     <div className="rounded-2xl border border-slate-200 bg-white p-12 text-center shadow-sm">
@@ -146,7 +147,7 @@ export default function StudentRequestsPage() {
                         {filter === "ALL" && (
                             <Link
                                 href="/student/tutors"
-                                className="mt-6 inline-block rounded-xl bg-blue-600 px-5 py-2.5 text-xs font-semibold text-white shadow-sm hover:bg-blue-700 transition"
+                                className="mt-6 inline-block rounded-xl bg-[#0070ad] px-5 py-2.5 text-xs font-bold text-white shadow-sm hover:bg-sky-700 transition"
                             >
                                 Browse Tutors
                             </Link>
@@ -168,10 +169,10 @@ export default function StudentRequestsPage() {
 
                                         <span
                                             className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold ${req.status === "ACCEPTED"
-                                                    ? "bg-emerald-100 text-emerald-800"
-                                                    : req.status === "PENDING"
-                                                        ? "bg-amber-100 text-amber-800"
-                                                        : "bg-rose-100 text-rose-800"
+                                                ? "bg-emerald-100 text-emerald-800"
+                                                : req.status === "PENDING"
+                                                    ? "bg-amber-100 text-amber-800"
+                                                    : "bg-rose-100 text-rose-800"
                                                 }`}
                                         >
                                             {req.status === "ACCEPTED" && <CheckCircle2 className="h-3.5 w-3.5" />}
@@ -191,7 +192,7 @@ export default function StudentRequestsPage() {
                                         <p className="text-[11px] font-semibold uppercase tracking-wider text-slate-400">Subjects Offered</p>
                                         <div className="flex flex-wrap gap-1.5 mt-1.5">
                                             {req.tutor?.subjects?.map((s) => (
-                                                <span key={s.id} className="rounded-md bg-blue-50 border border-blue-100 px-2 py-0.5 text-[10px] font-semibold text-blue-700">
+                                                <span key={s.id} className="rounded-md bg-sky-50 border border-sky-100 px-2 py-0.5 text-[10px] font-semibold text-[#0070ad]">
                                                     {s.subject.name}
                                                 </span>
                                             ))}
@@ -210,12 +211,12 @@ export default function StudentRequestsPage() {
                                                 href="/student/messages"
                                                 className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs font-semibold text-slate-700 hover:bg-slate-50 transition"
                                             >
-                                                <MessageSquare className="h-3.5 w-3.5 text-blue-600" />
+                                                <MessageSquare className="h-3.5 w-3.5 text-[#0070ad]" />
                                                 Chat
                                             </Link>
                                             <Link
                                                 href="/student/bookings"
-                                                className="inline-flex items-center gap-1.5 rounded-lg bg-blue-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-blue-700 transition"
+                                                className="inline-flex items-center gap-1.5 rounded-lg bg-[#0070ad] px-3 py-1.5 text-xs font-semibold text-white hover:bg-sky-700 transition"
                                             >
                                                 <CalendarPlus className="h-3.5 w-3.5" />
                                                 Book Session
